@@ -2,9 +2,9 @@ import Image from "next/image";
 
 export default function Sidebar() {
   return (
-    <div>
-      <div>
-        <div className="relative size-12">
+    <div className="fixed">
+      <div className="flex flex-col items-left gap-4 p-4 bg-slate-100 h-screen">
+        {/* <div className="relative size-12 text-center">
           <Image
               className="rounded-full"
               src="/the_sleeve_pfp.jpg"
@@ -12,10 +12,22 @@ export default function Sidebar() {
               priority
               fill
             />
-        </div>
+        </div> */}
         <div>
-          <h1 className="text-bold text-amber-950">Chanel Muir</h1>
+          <h1 className="font-extrabold font-serif text-slate-600 hover:underline"><a href="/">chanelmuir.com</a></h1>
         </div>
+        <a href="/projects" className="hover:underline">
+          Projects
+        </a>
+        <a href="/training" className="hover:underline">
+          Training
+        </a>
+        <a href="/blog" className="hover:underline">
+          Blog
+        </a>
+        <a href="/contact" className="hover:underline">
+          Contact
+        </a>
       </div>
     </div>
   );
