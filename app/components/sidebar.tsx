@@ -22,6 +22,9 @@ export default function Sidebar() {
         <a href="/training" className="hover:underline">
           Training
         </a>
+        <a href="/gallery" className="hover:underline">
+          Gallery Game
+        </a>
         <a href="/blog" className="hover:underline">
           Blog
         </a>
