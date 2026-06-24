@@ -47,7 +47,7 @@ export default function Home() {
                   </a>
                 </span>
                 <p className="text-sm text-gray-500">
-                  A group project where we built a log analysis tool for businesses to gain insights into web traffic and diagnose bottlenecks & issues.
+                  A group project where we built a log analysis tool for businesses to gain insights into web traffic and diagnose bottlenecks & issues. Built with Next.js, TypeScript, Tailwind, Google Cloud / BigQuery, Google GenAI, and more.
                 </p>
               </div>
             </div>
