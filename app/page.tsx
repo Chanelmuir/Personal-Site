@@ -26,7 +26,7 @@ export default function Home() {
               </div>
               {/* Selective Site Blocker */}
               <div>
-                <Image src="/specific_site_blocker.png" alt="Specific Site Blocker" width={300} height={200} className="border-5 border-gray-500" />
+                <Image src="/specific_site_blocker_cropped.png" alt="Specific Site Blocker" width={300} height={200} className="border-5 border-gray-500" />
                 <span className="flex items-left items-center mt-2">
                   <h2>Specific Site Blocker</h2>
                   <a href="https://github.com/Chanelmuir/Selective-Site-Blocker" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0"><Image src="/github_logo.svg" alt="GitHub Icon" width={16} height={16} className="align-middle" /></a>
