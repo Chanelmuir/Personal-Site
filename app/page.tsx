@@ -24,6 +24,7 @@ export default function Home() {
                   A web app for runners to track and plan running routes, with all their runs visible on one map. Built with Next.js, TypeScript, and Postgres.
                 </p>
               </div>
+              {/* Selective Site Blocker */}
               <div>
                 <Image src="/specific_site_blocker.png" alt="Specific Site Blocker" width={300} height={200} className="border-5 border-gray-500" />
                 <span className="flex items-left items-center mt-2">
@@ -32,6 +33,21 @@ export default function Home() {
                 </span>
                 <p className="text-sm text-gray-500">
                   A chrome extension that allows users to block websites, whilst allowing access to specific pages on those sites. Built with HTML, CSS, and JavaScript.
+                </p>
+              </div>
+
+              {/* Mjolnir */}
+              <div>
+                <Image src="/mjolnir.png" alt="Mjolnir" width={300} height={200} className="border-5 border-gray-500" />
+                <span className="flex items-left items-center mt-2">
+                  <h2>Mjolnir</h2>
+                  <a href="https://github.com/Dmitry-H1/Mjolnirv2" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0"><Image src="/github_logo.svg" alt="GitHub Icon" width={16} height={16} className="align-middle" /></a>
+                  <a href="https://mjolnir.live/login/" target="_blank" rel="noopener noreferrer" className="pl-1">
+                    <i className="fa-solid fa-arrow-up-right-from-square" />
+                  </a>
+                </span>
+                <p className="text-sm text-gray-500">
+                  A group project where we built a log analysis tool for businesses to gain insights into web traffic and diagnose bottlenecks & issues.
                 </p>
               </div>
             </div>
