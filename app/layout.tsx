@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "./components/sidebar";
 import Script from "next/dist/client/script";
+import Navbar from "./components/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,13 +31,15 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <title>Chanel Muir</title>
+        <link rel="icon" href="/favicon.ico" />
         <Script 
           src="https://kit.fontawesome.com/cbfd9f18ad.js" 
           strategy="afterInteractive" 
         />
       </head>
-      <body className="min-h-full flex flex-col">
-        <Sidebar />
+      <body className="min-h-full flex flex-col bg-background">
+        <Navbar />
         {children}</body>
     </html>
   );

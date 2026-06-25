@@ -5,11 +5,17 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+
+  --color-accent: #166534;
+  --color-accent-light: #dcfce7;
+
+  --color-border: #cbd5e1;
 }
 
 @media (prefers-color-scheme: dark) {
