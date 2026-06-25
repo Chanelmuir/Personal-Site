@@ -20,17 +20,41 @@ export default function Home() {
           <div className="mt-8 flex gap-4">
             <a
               href="/resume.pdf"
-              className="rounded-lg bg-accent px-5 py-3 text-white hover:opacity-90">
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-white hover:opacity-90">
+              <i className="fa-solid fa-file"></i>
               Resume
             </a>
 
             <a
               href="https://github.com/chanelmuir"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 hover:border-accent"
             >
-              <Image src="/github_logo.svg" alt="GitHub Icon" width={16} height={16} className="align-middle" />
+              <i className="fa-brands fa-github"></i>
               GitHub
             </a>
+
+            <a
+              href="https://www.linkedin.com/in/chanelmuir/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 hover:border-accent"
+            >
+              <i className="fa-brands fa-linkedin"></i>
+              <span>LinkedIn</span>
+            </a>
+
+            <a
+              href="mailto:chanelkmuir@gmail.com"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 hover:border-accent"
+            >
+              <i className="fa-solid fa-envelope text-sm" /> 
+              <span>Email</span>
+            </a>
+
           </div>
         </section>
         {/* Projects & Blog */}
@@ -49,7 +73,9 @@ export default function Home() {
                   <a href="https://sleevemap.chanelmuir.com/" target="_blank" rel="noopener noreferrer" className="pl-1">
                     <i className="fa-solid fa-arrow-up-right-from-square" />
                   </a>
-                  <a href="https://github.com/chanelmuir/sleevemap" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0"><Image src="/github_logo.svg" alt="GitHub Icon" width={16} height={16} className="align-middle" /></a>
+                  <a href="https://github.com/chanelmuir/sleevemap" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0">
+                    <i className="fa-brands fa-github"></i>
+                  </a>
                 </span>
                 <p className="text-sm text-gray-500">
                   A web app for runners to track and plan running routes, with all their runs visible on one map. 
@@ -76,9 +102,11 @@ export default function Home() {
                 <div className="p-4">
                   <span className="flex items-left items-center">
                     <h2 className="font-bold">Mjolnir</h2>
-                    <a href="https://github.com/Dmitry-H1/Mjolnirv2" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0"><Image src="/github_logo.svg" alt="GitHub Icon" width={16} height={16} className="align-middle" /></a>
                     <a href="https://mjolnir.live/login/" target="_blank" rel="noopener noreferrer" className="pl-1">
                       <i className="fa-solid fa-arrow-up-right-from-square" />
+                    </a>
+                    <a href="https://github.com/Dmitry-H1/Mjolnirv2" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0">
+                      <i className="fa-brands fa-github"></i>
                     </a>
                   </span>
                   <p className="text-sm text-gray-500">
@@ -108,7 +136,9 @@ export default function Home() {
                 <div className="p-4">
                   <span className="flex items-left items-center">
                     <h2 className="font-bold">Specific Site Blocker</h2>
-                    <a href="https://github.com/Chanelmuir/Selective-Site-Blocker" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0"><Image src="/github_logo.svg" alt="GitHub Icon" width={16} height={16} className="align-middle" /></a>
+                    <a href="https://github.com/Chanelmuir/Selective-Site-Blocker" target="_blank" rel="noopener noreferrer" className="pl-1 pr-0">
+                      <i className="fa-brands fa-github"></i>
+                    </a>
                   </span>
                   <p className="text-sm text-gray-500">
                     A chrome extension that allows users to block websites, whilst allowing access to specific pages on those sites.
