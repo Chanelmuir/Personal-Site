@@ -2,19 +2,19 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex w-full flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-accent-light/30 to-background" />
+    <div className="relative overflow-x-hidden flex flex-col items-center justify-center">
+      <div className="absolute inset-x-0 top-0 -z-10 h-125 pointer-events-none bg-[radial-gradient(circle_at_top_left,var(--color-accent-light)_0%,transparent_70%)] opacity-70 blur-3xl" />
+      <main className="flex w-full flex-col items-start justify-between py-32 px-16 sm:items-start">
+        
         {/* Intro */}
-        <section className="max-w-6xl mx-auto px-6 py-24">
+        <section className="max-w-8xl py-8">
           <h1 className="text-5xl font-bold tracking-tight">
             Chanel Muir
           </h1>
 
           <p className="mt-6 text-xl text-text-secondary max-w-2xl">
             Computer Science graduate from La Salle University, former NCAA Division I runner,
-            and builder of web applications, mapping tools,
-            and data-driven products.
+            building web applications, mapping tools, and data-driven products.
           </p>
 
           <div className="mt-8 flex gap-4">
@@ -31,28 +31,25 @@ export default function Home() {
               href="https://github.com/chanelmuir"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 hover:border-accent"
+              className="inline-flex items-center rounded-lg border border-border p-4 hover:border-accent"
             >
               <i className="fa-brands fa-github"></i>
-              GitHub
             </a>
 
             <a
               href="https://www.linkedin.com/in/chanelmuir/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 hover:border-accent"
+              className="inline-flex items-center rounded-lg border border-border p-4 hover:border-accent"
             >
               <i className="fa-brands fa-linkedin"></i>
-              <span>LinkedIn</span>
             </a>
 
             <a
               href="mailto:chanelkmuir@gmail.com"
-              className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 hover:border-accent"
+              className="inline-flex items-center rounded-lg border border-border p-4 hover:border-accent"
             >
               <i className="fa-solid fa-envelope text-sm" /> 
-              <span>Email</span>
             </a>
 
           </div>
