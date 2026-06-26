@@ -1,6 +1,17 @@
 import Image from "next/image";
+import RouteSparkline from "./components/routeSparkline";
 
-export default function Home() {
+async function getRecentActivities() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/recent-activities`, {
+    cache: 'no-store',
+  })
+  if (!res.ok) return []
+  const { activities } = await res.json()
+  return activities
+}
+
+export default async function Home() {
+  const recentActivities = await getRecentActivities()
   return (
     <div className="relative overflow-x-hidden flex flex-col items-center justify-center">
       <div className="absolute inset-x-0 top-0 -z-10 h-125 pointer-events-none bg-[radial-gradient(circle_at_top_left,var(--color-accent-light)_0%,transparent_70%)] opacity-70 blur-3xl" />
@@ -164,7 +175,7 @@ export default function Home() {
             <div className="flex flex-col gap-4">
               <div className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4">
                 <span className="p-4">
-                  <a href="chanelmuir.com/posts/making-sleevemap" className="font-bold hover:shadow-md">Making SleeveMap</a>
+                  <a href="chanelmuir.com/posts/making-sleevemap" className="font-bold hover:shadow-md hover:text-accent">Making SleeveMap</a>
                   <p className="text-sm text-gray-500">Posted: 26/06/26</p>
                 </span>
               </div>
@@ -177,12 +188,35 @@ export default function Home() {
               Strava Activities:
             </h2>
             <div className="flex flex-col gap-4">
-              <div className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4">
-                <span className="p-4">
-                  <a href="chanelmuir.com/posts/making-sleevemap" className="font-bold hover:shadow-md">Making SleeveMap</a>
-                  <p className="text-sm text-gray-500">Posted: 26/06/26</p>
-                </span>
-              </div>
+              {recentActivities.map((activity: any) => (
+                <div
+                  key={activity.id}
+                  className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4"
+                >
+                  <span className="p-4">
+                    <a
+                      href={`https://www.strava.com/activities/${activity.strava_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold hover:text-accent hover:shadow-md"
+                    >
+                      {activity.name}
+                    </a>
+                    <p className="text-sm text-gray-500">
+                      {new Date(activity.start_date).toLocaleDateString('en-NZ', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                      })}
+                      {' · '}
+                      {(activity.distance_m / 1000).toFixed(1)} km
+                    </p>
+                  </span>
+                  <span className="flex items-center pr-4">
+                    <RouteSparkline route={activity.route} />
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
