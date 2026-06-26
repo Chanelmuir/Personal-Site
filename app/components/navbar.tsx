@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Navbar() {
   return (
-    <div className="fixed w-full z-50">
+    <div className="sticky top-0 z-50 w-full">
       <div className="flex justify-between gap-4 p-4 bg-surface border-b border-border">
         {/* Left (Main Page) */}
         <div>

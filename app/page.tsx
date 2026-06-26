@@ -4,10 +4,10 @@ export default function Home() {
   return (
     <div className="relative overflow-x-hidden flex flex-col items-center justify-center">
       <div className="absolute inset-x-0 top-0 -z-10 h-125 pointer-events-none bg-[radial-gradient(circle_at_top_left,var(--color-accent-light)_0%,transparent_70%)] opacity-70 blur-3xl" />
-      <main className="flex w-full flex-col items-start justify-between py-32 px-16 sm:items-start">
+      <main className="flex w-full flex-col items-start justify-between px-16 py-8 sm:items-start">
         
         {/* Intro */}
-        <section className="max-w-8xl py-8">
+        <section className="max-w-8xl py-20">
           <h1 className="text-5xl font-bold tracking-tight">
             Chanel Muir
           </h1>
@@ -55,9 +55,9 @@ export default function Home() {
           </div>
         </section>
         {/* Projects & Blog */}
-        <div className="grid gap-16 sm:grid-cols-2">
+        <div className="grid gap-16 sm:grid-cols-4">
           {/* Projects */}
-          <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
+          <div className="sm:col-span-2 flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
             <h2 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
               Projects:
             </h2>
@@ -157,10 +157,33 @@ export default function Home() {
             </div>
           </div>
           {/* Blog */}
-          <div>
+          <div className="sm:col-span-1">
             <h2 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-              Blog:
+              Posts:
             </h2>
+            <div className="flex flex-col gap-4">
+              <div className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4">
+                <span className="p-4">
+                  <a href="chanelmuir.com/posts/making-sleevemap" className="font-bold hover:shadow-md">Making SleeveMap</a>
+                  <p className="text-sm text-gray-500">Posted: 26/06/26</p>
+                </span>
+              </div>
+
+            </div>
+          </div>
+          {/* Strava */}
+          <div className="sm:col-span-1">
+            <h2 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+              Strava Activities:
+            </h2>
+            <div className="flex flex-col gap-4">
+              <div className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4">
+                <span className="p-4">
+                  <a href="chanelmuir.com/posts/making-sleevemap" className="font-bold hover:shadow-md">Making SleeveMap</a>
+                  <p className="text-sm text-gray-500">Posted: 26/06/26</p>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </main>
