@@ -30,7 +30,7 @@ export default async function Home() {
           </h1>
 
           <p className="mt-6 text-xl text-text-secondary max-w-2xl">
-            Computer Science graduate from La Salle University, former NCAA Division I runner,
+            Computer Science graduate from La Salle University, 
             building web applications, mapping tools, and data-driven products.
           </p>
 
