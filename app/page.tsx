@@ -1,5 +1,7 @@
 import Image from "next/image";
 import RouteSparkline from "./components/routeSparkline";
+import { getAllPostsMeta } from './lib/posts'
+
 
 async function getRecentActivities() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/recent-activities`, {
@@ -12,6 +14,10 @@ async function getRecentActivities() {
 
 export default async function Home() {
   const recentActivities = await getRecentActivities()
+  const posts = getAllPostsMeta()
+  console.log('posts found:', posts)
+
+
   return (
     <div className="relative overflow-x-hidden flex flex-col items-center justify-center">
       <div className="absolute inset-x-0 top-0 -z-10 h-125 pointer-events-none bg-[radial-gradient(circle_at_top_left,var(--color-accent-light)_0%,transparent_70%)] opacity-70 blur-3xl" />
@@ -172,15 +178,18 @@ export default async function Home() {
             <h2 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
               Posts:
             </h2>
-            <div className="flex flex-col gap-4">
-              <div className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4">
+            {posts.map((post) => (
+              <div key={post.slug} className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4">
                 <span className="p-4">
-                  <a href="chanelmuir.com/posts/making-sleevemap" className="font-bold hover:shadow-md hover:text-accent">Making SleeveMap</a>
-                  <p className="text-sm text-gray-500">Posted: 26/06/26</p>
+                  <a href={`/posts/${post.slug}`} className="font-bold hover:text-accent">
+                    {post.title}
+                  </a>
+                  <p className="text-sm text-gray-500">
+                    Posted: {new Date(post.date).toLocaleDateString('en-NZ')}
+                  </p>
                 </span>
               </div>
-
-            </div>
+            ))}
           </div>
           {/* Strava */}
           <div className="sm:col-span-1">
