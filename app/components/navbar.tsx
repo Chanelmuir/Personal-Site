@@ -10,7 +10,7 @@ export default function Navbar() {
         </div>
         {/* Right (Navigation Links) */}
         <div className="flex gap-4 align-end mr-5 text-text-secondary">
-          <a href="/training" className="hover:text-accent">
+          <a href="/gallery" className="hover:text-accent">
             Gallery
           </a>
           <a href="/contact" className="hover:text-accent">
