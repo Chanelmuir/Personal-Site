@@ -266,7 +266,7 @@ export default function GalleryGamePage() {
 
       {/* Sidebar */}
       <aside
-        className={`w-full sm:w-[380px] flex-shrink-0 border-l border-border bg-surface flex flex-col overflow-y-auto ${
+        className={`w-full sm:w-[380px] flex-shrink-0 border-l border-border bg-surface flex flex-col overflow-y-auto h-full ${
           mobileView === 'photo' ? 'hidden sm:flex' : 'flex'
         }`}
       >
