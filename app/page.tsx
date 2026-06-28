@@ -21,7 +21,7 @@ export default async function Home() {
   return (
     <div className="relative overflow-x-hidden flex flex-col items-center justify-center">
       <div className="absolute inset-x-0 top-0 -z-10 h-125 pointer-events-none bg-[radial-gradient(circle_at_top_left,var(--color-accent-light)_0%,transparent_70%)] opacity-70 blur-3xl" />
-      <main className="flex w-full flex-col items-start justify-between px-16 py-8 sm:items-start">
+      <main className="flex w-full flex-col items-start justify-between px-4 py-8 sm:px-16 sm:items-start">
         
         {/* Intro */}
         <section className="max-w-8xl py-20">
@@ -34,7 +34,7 @@ export default async function Home() {
             building web applications, mapping tools, and data-driven products.
           </p>
 
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex flex-wrap gap-4">
             <a
               href="/resume.pdf"
               target="_blank"
@@ -72,7 +72,7 @@ export default async function Home() {
           </div>
         </section>
         {/* Projects & Blog */}
-        <div className="grid gap-16 sm:grid-cols-4">
+        <div className="grid gap-8 sm:gap-16 sm:grid-cols-4">
           {/* Projects */}
           <div className="sm:col-span-2 flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
             <h2 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
