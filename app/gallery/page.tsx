@@ -44,6 +44,7 @@ export default function GalleryGamePage() {
   const [revealed, setRevealed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [mapStyle, setMapStyle] = useState<MapStyleKey>('standard')
+  const [mobileView, setMobileView] = useState<'photo' | 'guess'>('photo')
 
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
@@ -79,8 +80,8 @@ export default function GalleryGamePage() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: MAP_STYLES.standard,
-      center: [0, 20],
-      zoom: 1.3,
+      center: [-160, 0],
+      zoom: 1,
     })
 
     map.current.on('click', (e) => {
@@ -105,7 +106,12 @@ export default function GalleryGamePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Handle style switching: setStyle() wipes markers/layers, so re-add them
+  useEffect(() => {
+    if (mobileView === 'guess' && map.current) {
+      const timeout = setTimeout(() => map.current?.resize(), 50)
+      return () => clearTimeout(timeout)
+    }
+  }, [mobileView])
 
   useEffect(() => {
     if (!map.current) return
@@ -221,9 +227,13 @@ export default function GalleryGamePage() {
   const score = distanceKm !== null ? calculateScore(distanceKm) : null
 
   return (
-    <main className="flex w-full h-[calc(100dvh-64px)] overflow-hidden bg-surface">
+    <main className="flex flex-col sm:flex-row w-full h-[calc(100dvh-64px)] overflow-hidden bg-surface">
       {/* Photo panel */}
-      <div className="relative flex-1 bg-black/5">
+      <div
+        className={`relative flex-1 bg-black/5 ${
+          mobileView === 'guess' ? 'hidden sm:block' : 'block'
+        }`}
+      >
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -236,7 +246,7 @@ export default function GalleryGamePage() {
 
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <p className="text-white text-lg">Loading a memory...</p>
+            <p className="text-white text-lg">Loading a photo...</p>
           </div>
         )}
         {!loading && !photo && (
@@ -244,24 +254,42 @@ export default function GalleryGamePage() {
             <p className="text-white text-lg">No photos have been added yet.</p>
           </div>
         )}
+
+        {/* Mobile switch button */}
+        <button
+          onClick={() => setMobileView('guess')}
+          className="sm:hidden absolute bottom-4 right-4 rounded-lg bg-accent px-4 py-3 text-white shadow-lg"
+        >
+          Make a guess →
+        </button>
       </div>
 
-      {/* Sidebar: title, map, controls, reveal */}
-      <aside className="w-[380px] flex-shrink-0 border-l border-border bg-surface flex flex-col overflow-y-auto">
-        <div className="p-6 border-b border-border">
-          <h1 className="text-2xl font-bold tracking-tight">Gallery Game</h1>
-          <p className="text-text-secondary text-sm mt-1">
-            Where in the world was this photo taken?
-          </p>
+      {/* Sidebar */}
+      <aside
+        className={`w-full sm:w-[380px] flex-shrink-0 border-l border-border bg-surface flex flex-col overflow-y-auto ${
+          mobileView === 'photo' ? 'hidden sm:flex' : 'flex'
+        }`}
+      >
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Gallery Game</h1>
+            <p className="text-text-secondary text-sm mt-1">
+              Where in the world was this photo taken?
+            </p>
+          </div>
+
+          {/* Mobile-only switch back to photo */}
+          <button
+            onClick={() => setMobileView('photo')}
+            className="sm:hidden text-sm text-text-secondary hover:text-accent whitespace-nowrap ml-3"
+          >
+            ← Photo
+          </button>
         </div>
 
         <div className="p-6 flex flex-col gap-4">
-
           {/* Map */}
-          <div
-            className={"rounded-xl border border-border overflow-hidden shadow-sm transition-all duration-300 h-[40vh]"
-          }
-          >
+          <div className="rounded-xl border border-border overflow-hidden shadow-sm transition-all duration-300 h-[40vh]">
             <div ref={mapContainer} className="w-full h-full" />
           </div>
 
