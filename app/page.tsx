@@ -30,7 +30,7 @@ export default async function Home() {
           </h1>
 
           <p className="mt-6 text-xl text-text-secondary max-w-2xl">
-            Computer Science graduate from La Salle University, 
+            Computer Science graduate from Christchurch, New Zealand, 
             building web applications, mapping tools, and data-driven products.
           </p>
 
@@ -194,8 +194,9 @@ export default async function Home() {
           {/* Strava */}
           <div className="sm:col-span-1">
             <h2 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-              Strava Activities:
+              Recent Activities:
             </h2>
+            <Image src="/api_logo_pwrdBy_strava_horiz_orange.svg" alt="Powered by Strava" width={100} height={100} className="mt-2 mb-4" />
             <div className="flex flex-col gap-2">
               {recentActivities.map((activity: any) => (
                 <div
