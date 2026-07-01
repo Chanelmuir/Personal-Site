@@ -13,9 +13,9 @@ export default function Navbar() {
           <a href="/gallery" className="hover:text-accent">
             Gallery
           </a>
-          <a href="/contact" className="hover:text-accent">
+          {/* <a href="/contact" className="hover:text-accent">
             Contact
-          </a>
+          </a> */}
         </div>
       </div>
     </div>
