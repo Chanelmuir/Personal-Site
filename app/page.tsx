@@ -196,7 +196,7 @@ export default async function Home() {
             <h2 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
               Strava Activities:
             </h2>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {recentActivities.map((activity: any) => (
                 <div
                   key={activity.id}
