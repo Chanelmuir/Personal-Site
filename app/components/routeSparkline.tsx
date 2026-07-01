@@ -1,32 +1,32 @@
-export default function RouteSparkline({ route, width = 64, height = 64 }: {
+import { encodePolyline, simplify } from '../lib/polyline'
+
+export default function RouteSparkline({ route, width = 300, height = 150 }: {
   route: { type: string; coordinates: [number, number][] } | null
   width?: number
   height?: number
 }) {
   if (!route?.coordinates?.length) return null
 
-  const points = route.coordinates
+  const coords = simplify(route.coordinates)
+  const encoded = encodeURIComponent(encodePolyline(coords))
 
-  const lngs = points.map(p => p[0])
-  const lats = points.map(p => p[1])
-  const minLat = Math.min(...lats), maxLat = Math.max(...lats)
-  const minLng = Math.min(...lngs), maxLng = Math.max(...lngs)
+  // Layered glow: wide soft halo underneath, crisp line on top
+  const glow = `path-8+166534-0.35(${encoded})`
+  const line = `path-3+166534-1(${encoded})`
+  const pathOverlay = `${glow},${line}`
 
-  const latRange = maxLat - minLat || 1
-  const lngRange = maxLng - minLng || 1
-
-  const padding = 4
-  const path = points
-    .map(([lng, lat], i) => {
-      const x = padding + ((lng - minLng) / lngRange) * (width - padding * 2)
-      const y = padding + (1 - (lat - minLat) / latRange) * (height - padding * 2)
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
-    })
-    .join(' ')
+  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+  const src = `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${pathOverlay}/auto/${width}x${height}@2x?padding=20&access_token=${token}`
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-      <path d={path} fill="none" stroke="var(--color-accent)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt="Route map"
+      width={width}
+      height={height}
+      className="rounded-lg object-cover"
+      loading="lazy"
+    />
   )
 }

@@ -200,9 +200,9 @@ export default async function Home() {
               {recentActivities.map((activity: any) => (
                 <div
                   key={activity.id}
-                  className="flex bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all justify-between mt-4"
+                  className="flex-col bg-surface rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all mt-4"
                 >
-                  <span className="p-4">
+                  <div className="pt-4 px-4 pb-2 w-full">
                     <a
                       href={`https://www.strava.com/activities/${activity.strava_id}`}
                       target="_blank"
@@ -211,7 +211,12 @@ export default async function Home() {
                     >
                       {activity.name}
                     </a>
-                    <p className="text-sm text-gray-500">
+                  </div>
+                  <div className="flex items-center px-4">
+                    <RouteSparkline route={activity.route} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 px-4 py-2">
                       {new Date(activity.start_date).toLocaleDateString('en-NZ', {
                         day: '2-digit',
                         month: '2-digit',
@@ -220,10 +225,7 @@ export default async function Home() {
                       {' · '}
                       {(activity.distance_m / 1000).toFixed(1)} km
                     </p>
-                  </span>
-                  <span className="flex items-center pr-4">
-                    <RouteSparkline route={activity.route} />
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>
