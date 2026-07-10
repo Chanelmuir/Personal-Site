@@ -17,10 +17,16 @@ export default async function PostPage({
   if (!post) notFound()
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-32">
-      <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
+    <main className="max-w-2xl mx-auto px-6 py-24 sm:py-32">
+      <a href="/" className="text-sm text-text-secondary hover:text-accent transition-colors">
+        ← Back
+      </a>
 
-      <p className="mt-2 text-sm text-gray-500">
+      <h1 className="mt-6 font-serif text-4xl tracking-tight text-text-primary sm:text-5xl">
+        {post.title}
+      </h1>
+
+      <p className="mt-3 text-sm text-text-secondary">
         {new Date(post.date).toLocaleDateString('en-NZ', {
           day: '2-digit',
           month: '2-digit',
@@ -28,19 +34,14 @@ export default async function PostPage({
         })}
       </p>
 
-      <div className="mt-4 flex gap-2 flex-wrap">
-        {post.tags.map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full bg-accent-light px-3 py-1 text-sm text-accent"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+      {post.tags.length > 0 && (
+        <p className="mt-4 text-xs uppercase tracking-wide text-text-secondary">
+          {post.tags.join(" · ")}
+        </p>
+      )}
 
       <article
-        className="prose prose-zinc dark:prose-invert mt-10 max-w-none"
+        className="prose prose-zinc mt-10 max-w-none prose-headings:font-serif prose-a:text-accent"
         dangerouslySetInnerHTML={{ __html: post.contentHtml }}
       />
     </main>
