@@ -272,7 +272,7 @@ export default function GalleryGamePage() {
       >
         <div className="p-6 border-b border-border flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Gallery Game</h1>
+            <h1 className="font-serif text-2xl tracking-tight">Gallery Game</h1>
             <p className="text-text-secondary text-sm mt-1">
               Where in the world was this photo taken?
             </p>

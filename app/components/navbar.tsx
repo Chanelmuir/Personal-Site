@@ -1,16 +1,17 @@
-import Image from "next/image";
-
 export default function Navbar() {
   return (
-    <div className="sticky top-0 z-50 w-full">
-      <div className="flex justify-between gap-4 p-4 bg-surface border-b border-border">
+    <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-sm">
+      <div className="flex justify-between items-center gap-4 px-6 py-5 sm:px-16 max-w-6xl mx-auto w-full">
         {/* Left (Main Page) */}
-        <div>
-          <h1 className="font-extrabold font-serif text-slate-600 hover:text-accent"><a href="/">chanelmuir.com</a></h1>
-        </div>
+        <a
+          href="/"
+          className="font-serif text-lg italic tracking-tight text-text-primary hover:text-accent transition-colors"
+        >
+          chanelmuir.com
+        </a>
         {/* Right (Navigation Links) */}
-        <div className="flex gap-4 align-end mr-5 text-text-secondary">
-          <a href="/gallery" className="hover:text-accent">
+        <div className="flex gap-6 text-sm text-text-secondary">
+          <a href="/gallery" className="hover:text-accent transition-colors">
             Gallery
           </a>
           {/* <a href="/contact" className="hover:text-accent">
