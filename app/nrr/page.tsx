@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
+import type { ExpressionSpecification } from 'mapbox-gl'
 import courseData from './course-data.json'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
@@ -72,7 +73,26 @@ const changeovers = data.features
 
 const totalDistanceKm = legs.reduce((sum, leg) => sum + leg.distanceKm, 0)
 
-const LEG_LINE_WIDTH = 4
+// [zoom, pixel width] stops: lines stay thin and tightly bundled when zoomed
+// out, and fan out as you zoom in, so the per-leg offset below (a multiple
+// of the width at each stop) never looks like a wide, disconnected gap.
+const WIDTH_STOPS: [number, number][] = [
+  [8, 1.5],
+  [11, 4],
+  [15, 7],
+]
+
+function widthExpression(extra: number): ExpressionSpecification {
+  const expr: unknown[] = ['interpolate', ['linear'], ['zoom']]
+  WIDTH_STOPS.forEach(([zoom, width]) => expr.push(zoom, width + extra))
+  return expr as unknown as ExpressionSpecification
+}
+
+function offsetExpression(indexFactor: number): ExpressionSpecification {
+  const expr: unknown[] = ['interpolate', ['linear'], ['zoom']]
+  WIDTH_STOPS.forEach(([zoom, width]) => expr.push(zoom, width * indexFactor))
+  return expr as unknown as ExpressionSpecification
+}
 
 export default function NrrPage() {
   const mapContainer = useRef<HTMLDivElement>(null)
@@ -103,7 +123,8 @@ export default function NrrPage() {
 
       legs.forEach((leg, index) => {
         const sourceId = `leg-${leg.number}`
-        const offset = (index - (legs.length - 1) / 2) * LEG_LINE_WIDTH
+        const indexFactor = index - (legs.length - 1) / 2
+        const offset = offsetExpression(indexFactor)
         instance.addSource(sourceId, {
           type: 'geojson',
           data: {
@@ -119,7 +140,7 @@ export default function NrrPage() {
           layout: { 'line-join': 'round', 'line-cap': 'round' },
           paint: {
             'line-color': '#1c1917',
-            'line-width': LEG_LINE_WIDTH + 1,
+            'line-width': widthExpression(1),
             'line-opacity': 0.25,
             'line-offset': offset,
           },
@@ -129,7 +150,7 @@ export default function NrrPage() {
           type: 'line',
           source: sourceId,
           layout: { 'line-join': 'round', 'line-cap': 'round' },
-          paint: { 'line-color': leg.color, 'line-width': LEG_LINE_WIDTH, 'line-offset': offset },
+          paint: { 'line-color': leg.color, 'line-width': widthExpression(0), 'line-offset': offset },
         })
         instance.on('click', `${sourceId}-line`, () => {
           setSelectedLeg((current) => (current === leg.number ? null : leg.number))
@@ -177,7 +198,7 @@ export default function NrrPage() {
       const casingLayer = `leg-${leg.number}-casing`
       if (!instance.getLayer(lineLayer)) return
 
-      instance.setPaintProperty(lineLayer, 'line-width', isSelected ? LEG_LINE_WIDTH + 2 : LEG_LINE_WIDTH)
+      instance.setPaintProperty(lineLayer, 'line-width', widthExpression(isSelected ? 2 : 0))
       instance.setPaintProperty(lineLayer, 'line-opacity', isDimmed ? 0.25 : 1)
       instance.setPaintProperty(casingLayer, 'line-opacity', isDimmed ? 0.08 : 0.25)
     })
