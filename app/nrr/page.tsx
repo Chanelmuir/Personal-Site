@@ -82,12 +82,13 @@ export default function NrrPage() {
 
     const bounds = new mapboxgl.LngLatBounds()
     legs.forEach((leg) => leg.coordinates.forEach((c) => bounds.extend([c[0], c[1]])))
+    const center = bounds.getCenter()
 
     const instance = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/standard',
-      bounds,
-      fitBoundsOptions: { padding: 48 },
+      center: [center.lng, center.lat],
+      zoom: 11,
     })
     map.current = instance
 
@@ -95,8 +96,12 @@ export default function NrrPage() {
     resizeObserver.observe(mapContainer.current)
 
     instance.on('load', () => {
-      legs.forEach((leg) => {
+      instance.resize()
+      instance.fitBounds(bounds, { padding: 48, duration: 0 })
+
+      legs.forEach((leg, index) => {
         const sourceId = `leg-${leg.number}`
+        const offset = (index - (legs.length - 1) / 2) * 3
         instance.addSource(sourceId, {
           type: 'geojson',
           data: {
@@ -110,14 +115,14 @@ export default function NrrPage() {
           type: 'line',
           source: sourceId,
           layout: { 'line-join': 'round', 'line-cap': 'round' },
-          paint: { 'line-color': '#1c1917', 'line-width': 6, 'line-opacity': 0.25 },
+          paint: { 'line-color': '#1c1917', 'line-width': 6, 'line-opacity': 0.25, 'line-offset': offset },
         })
         instance.addLayer({
           id: `${sourceId}-line`,
           type: 'line',
           source: sourceId,
           layout: { 'line-join': 'round', 'line-cap': 'round' },
-          paint: { 'line-color': leg.color, 'line-width': 4 },
+          paint: { 'line-color': leg.color, 'line-width': 4, 'line-offset': offset },
         })
         instance.on('click', `${sourceId}-line`, () => {
           setSelectedLeg((current) => (current === leg.number ? null : leg.number))
@@ -187,8 +192,8 @@ export default function NrrPage() {
   return (
     <main className="flex flex-col sm:flex-row w-full h-[calc(100dvh-68px)] overflow-hidden">
       {/* Map */}
-      <div className="relative flex-1 order-2 sm:order-1">
-        <div ref={mapContainer} className="absolute inset-0" />
+      <div className="relative flex-1 overflow-hidden order-2 sm:order-1">
+        <div ref={mapContainer} className="w-full h-full" />
       </div>
 
       {/* Sidebar */}
