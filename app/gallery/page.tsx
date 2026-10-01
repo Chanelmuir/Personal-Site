@@ -227,7 +227,7 @@ export default function GalleryGamePage() {
   const score = distanceKm !== null ? calculateScore(distanceKm) : null
 
   return (
-    <main className="flex flex-col sm:flex-row w-full h-[calc(100dvh-64px)] overflow-hidden bg-surface">
+    <main className="flex flex-col sm:flex-row w-full h-[calc(100dvh-68px)] overflow-hidden bg-surface">
       {/* Photo panel */}
       <div
         className={`relative flex-1 bg-black/5 ${

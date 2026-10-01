@@ -14,6 +14,9 @@ export default function Navbar() {
           <a href="/gallery" className="hover:text-accent transition-colors">
             Gallery
           </a>
+          <a href="/nrr" className="hover:text-accent transition-colors">
+            NRR
+          </a>
           {/* <a href="/contact" className="hover:text-accent">
             Contact
           </a> */}
