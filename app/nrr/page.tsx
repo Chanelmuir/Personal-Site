@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
+import type { ExpressionSpecification } from 'mapbox-gl'
 import courseData from './course-data.json'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
@@ -72,6 +73,27 @@ const changeovers = data.features
 
 const totalDistanceKm = legs.reduce((sum, leg) => sum + leg.distanceKm, 0)
 
+// [zoom, pixel width] stops: lines stay thin and tightly bundled when zoomed
+// out, and fan out as you zoom in, so the per-leg offset below (a multiple
+// of the width at each stop) never looks like a wide, disconnected gap.
+const WIDTH_STOPS: [number, number][] = [
+  [8, 1.5],
+  [11, 4],
+  [15, 7],
+]
+
+function widthExpression(extra: number): ExpressionSpecification {
+  const expr: unknown[] = ['interpolate', ['linear'], ['zoom']]
+  WIDTH_STOPS.forEach(([zoom, width]) => expr.push(zoom, width + extra))
+  return expr as unknown as ExpressionSpecification
+}
+
+function offsetExpression(indexFactor: number): ExpressionSpecification {
+  const expr: unknown[] = ['interpolate', ['linear'], ['zoom']]
+  WIDTH_STOPS.forEach(([zoom, width]) => expr.push(zoom, width * indexFactor))
+  return expr as unknown as ExpressionSpecification
+}
+
 export default function NrrPage() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
@@ -82,12 +104,13 @@ export default function NrrPage() {
 
     const bounds = new mapboxgl.LngLatBounds()
     legs.forEach((leg) => leg.coordinates.forEach((c) => bounds.extend([c[0], c[1]])))
+    const center = bounds.getCenter()
 
     const instance = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/standard',
-      bounds,
-      fitBoundsOptions: { padding: 48 },
+      center: [center.lng, center.lat],
+      zoom: 11,
     })
     map.current = instance
 
@@ -95,8 +118,13 @@ export default function NrrPage() {
     resizeObserver.observe(mapContainer.current)
 
     instance.on('load', () => {
-      legs.forEach((leg) => {
+      instance.resize()
+      instance.fitBounds(bounds, { padding: 48, duration: 0 })
+
+      legs.forEach((leg, index) => {
         const sourceId = `leg-${leg.number}`
+        const indexFactor = index - (legs.length - 1) / 2
+        const offset = offsetExpression(indexFactor)
         instance.addSource(sourceId, {
           type: 'geojson',
           data: {
@@ -110,14 +138,19 @@ export default function NrrPage() {
           type: 'line',
           source: sourceId,
           layout: { 'line-join': 'round', 'line-cap': 'round' },
-          paint: { 'line-color': '#1c1917', 'line-width': 6, 'line-opacity': 0.25 },
+          paint: {
+            'line-color': '#1c1917',
+            'line-width': widthExpression(1),
+            'line-opacity': 0.25,
+            'line-offset': offset,
+          },
         })
         instance.addLayer({
           id: `${sourceId}-line`,
           type: 'line',
           source: sourceId,
           layout: { 'line-join': 'round', 'line-cap': 'round' },
-          paint: { 'line-color': leg.color, 'line-width': 4 },
+          paint: { 'line-color': leg.color, 'line-width': widthExpression(0), 'line-offset': offset },
         })
         instance.on('click', `${sourceId}-line`, () => {
           setSelectedLeg((current) => (current === leg.number ? null : leg.number))
@@ -165,7 +198,7 @@ export default function NrrPage() {
       const casingLayer = `leg-${leg.number}-casing`
       if (!instance.getLayer(lineLayer)) return
 
-      instance.setPaintProperty(lineLayer, 'line-width', isSelected ? 6 : 4)
+      instance.setPaintProperty(lineLayer, 'line-width', widthExpression(isSelected ? 2 : 0))
       instance.setPaintProperty(lineLayer, 'line-opacity', isDimmed ? 0.25 : 1)
       instance.setPaintProperty(casingLayer, 'line-opacity', isDimmed ? 0.08 : 0.25)
     })
@@ -186,13 +219,43 @@ export default function NrrPage() {
 
   return (
     <main className="flex flex-col sm:flex-row w-full h-[calc(100dvh-68px)] overflow-hidden">
+      {/* Mobile leg bubbles */}
+      <div className="sm:hidden flex-shrink-0 border-b border-border bg-surface">
+        <div className="px-4 pt-3">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
+            National Road Relays
+          </p>
+          <h1 className="font-serif text-xl text-text-primary">2026 Course</h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            {legs.length} legs · {totalDistanceKm.toFixed(1)} km total
+          </p>
+        </div>
+        <div className="flex gap-3 overflow-x-auto px-4 py-3">
+          {legs.map((leg) => {
+            const isSelected = selectedLeg === leg.number
+            return (
+              <button
+                key={leg.id}
+                onClick={() => setSelectedLeg((current) => (current === leg.number ? null : leg.number))}
+                className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm transition-transform ${
+                  isSelected ? 'ring-2 ring-offset-2 ring-text-primary scale-110' : ''
+                }`}
+                style={{ backgroundColor: leg.color, textShadow: '0 1px 2px rgba(0,0,0,0.45)' }}
+              >
+                {leg.number}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Map */}
-      <div className="relative flex-1 order-2 sm:order-1">
-        <div ref={mapContainer} className="absolute inset-0" />
+      <div className="relative flex-1 overflow-hidden">
+        <div ref={mapContainer} className="w-full h-full" />
       </div>
 
       {/* Sidebar */}
-      <aside className="w-full sm:w-[340px] flex-shrink-0 border-b sm:border-b-0 sm:border-l border-border bg-surface flex flex-col overflow-y-auto order-1 sm:order-2">
+      <aside className="hidden sm:flex w-full sm:w-[340px] flex-shrink-0 border-l border-border bg-surface flex-col overflow-y-auto">
         <div className="p-6 border-b border-border">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
             National Road Relays
