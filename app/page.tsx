@@ -1,6 +1,7 @@
 import Image from "next/image";
 import RouteSparkline from "./components/routeSparkline";
 import { getAllPostsMeta } from './lib/posts'
+import { getAllProjectsMeta } from './lib/projects'
 
 
 async function getRecentActivities() {
@@ -12,35 +13,11 @@ async function getRecentActivities() {
   return activities
 }
 
-const PROJECTS = [
-  {
-    name: "SleeveMap",
-    image: "/sleevemap_ss.png",
-    href: "https://sleevemap.chanelmuir.com/",
-    repo: "https://github.com/chanelmuir/sleevemap",
-    description: "A web app for runners to track and plan running routes, with all their runs visible on one map.",
-    tags: ["Next.js", "TypeScript", "PostgreSQL"],
-  },
-  {
-    name: "Mjolnir",
-    image: "/mjolnir.png",
-    href: "https://mjolnir.live/login/",
-    repo: "https://github.com/Dmitry-H1/Mjolnirv2",
-    description: "A group project where we built a log analysis tool for businesses to gain insights into web traffic and diagnose bottlenecks & issues.",
-    tags: ["Next.js", "TypeScript", "Tailwind", "BigQuery"],
-  },
-  {
-    name: "Specific Site Blocker",
-    image: "/specific_site_blocker_cropped.png",
-    repo: "https://github.com/Chanelmuir/Selective-Site-Blocker",
-    description: "A chrome extension that allows users to block websites, whilst allowing access to specific pages on those sites.",
-    tags: ["HTML", "CSS", "JavaScript"],
-  },
-]
 
 export default async function Home() {
   const recentActivities = await getRecentActivities()
   const posts = getAllPostsMeta()
+  const projects = getAllProjectsMeta()
 
   return (
     <div className="relative overflow-x-hidden">
@@ -107,10 +84,10 @@ export default async function Home() {
         <section className="border-t border-border py-16">
           <h2 className="font-serif text-3xl text-text-primary">Projects</h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
-            {PROJECTS.map((project) => (
+            {projects.map((project) => (
               <div
-                key={project.name}
-                className="group overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/50"
+                key={project.slug}
+                className="group relative overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/50"
               >
                 <div className="aspect-[4/3] overflow-hidden">
                   <Image
@@ -123,18 +100,25 @@ export default async function Home() {
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-serif text-lg text-text-primary">{project.name}</h3>
+                    <h3 className="font-serif text-lg text-text-primary">
+                      {/* Stretched link: the whole card opens the project page */}
+                      <a href={`/projects/${project.slug}`} className="after:absolute after:inset-0">
+                        {project.name}
+                      </a>
+                    </h3>
                     {project.href && (
-                      <a href={project.href} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-accent">
+                      <a href={project.href} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name}`} className="relative z-10 text-text-secondary hover:text-accent">
                         <i className="fa-solid fa-arrow-up-right-from-square text-xs" />
                       </a>
                     )}
-                    <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-accent">
-                      <i className="fa-brands fa-github"></i>
-                    </a>
+                    {project.repo && (
+                      <a href={project.repo} target="_blank" rel="noopener noreferrer" aria-label={`${project.name} source`} className="relative z-10 text-text-secondary hover:text-accent">
+                        <i className="fa-brands fa-github"></i>
+                      </a>
+                    )}
                   </div>
                   <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                    {project.description}
+                    {project.tagline}
                   </p>
                   <p className="mt-4 text-xs uppercase tracking-wide text-text-secondary">
                     {project.tags.join(" · ")}
