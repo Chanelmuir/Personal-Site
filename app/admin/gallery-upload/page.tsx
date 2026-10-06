@@ -11,6 +11,7 @@ export default function GalleryUploadPage() {
   const [lat, setLat] = useState('')
   const [lng, setLng] = useState('')
   const [description, setDescription] = useState('')
+  const [password, setPassword] = useState('')
   const [status, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [gpsFoundInPhoto, setGpsFoundInPhoto] = useState<boolean | null>(null)
@@ -107,6 +108,7 @@ export default function GalleryUploadPage() {
 
     const res = await fetch('/api/admin/gallery-upload', {
       method: 'POST',
+      headers: { 'x-admin-password': password },
       body: formData,
     })
 
@@ -132,6 +134,18 @@ export default function GalleryUploadPage() {
       <h1 className="text-2xl font-bold tracking-tight">Add a gallery game photo</h1>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+        <div>
+          <label className="block text-sm text-text-secondary mb-1">Admin password</label>
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border border-border px-3 py-2"
+            required
+          />
+        </div>
+
         <div>
           <label className="block text-sm text-text-secondary mb-1">Photo</label>
           <input
