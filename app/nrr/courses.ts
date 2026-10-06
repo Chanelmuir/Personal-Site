@@ -63,6 +63,14 @@ function lineDistanceKm(coords: Coord[]): number {
 const folderId = (prefix: string) =>
   features.find((f) => f.properties.class === 'Folder' && f.properties.title.startsWith(prefix))!.id
 
+// Official leg distances from the event's course map. The drawn lines are a
+// little off, so these win over the distance measured along each line.
+const COURSE_MAP_KM: Record<string, number[]> = {
+  'Long Course': [8.05, 12.36, 9.86, 7.71, 10.51, 14.08, 7.96],
+  'Short Course': [8.06, 6.03, 6.35, 4.87, 5.51, 4.56],
+  '4 Leg Course': [4.56],
+}
+
 function legsInFolder(prefix: string): CourseLeg[] {
   const folder = folderId(prefix)
   return features
@@ -76,7 +84,7 @@ function legsInFolder(prefix: string): CourseLeg[] {
         label: `Leg ${number}`,
         color: f.properties.stroke ?? '#1c1917',
         coordinates,
-        distanceKm: lineDistanceKm(coordinates),
+        distanceKm: COURSE_MAP_KM[prefix]?.[number - 1] ?? lineDistanceKm(coordinates),
       }
     })
     .sort((a, b) => a.number - b.number)

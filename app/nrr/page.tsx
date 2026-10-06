@@ -206,6 +206,7 @@ export default function NrrPage() {
     }
   }, [selectedLeg, course, mapReady])
 
+  const activeLeg = course.legs.find((leg) => leg.number === selectedLeg)
   const summary = `${course.legs.length === 1 ? '4 laps' : `${course.legs.length} legs`} · ${course.totalKm.toFixed(1)} km total`
 
   return (
@@ -253,6 +254,15 @@ export default function NrrPage() {
       {/* Map */}
       <div className="relative flex-1 overflow-hidden">
         <div ref={mapContainer} className="w-full h-full" />
+        {activeLeg && (
+          <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-3 rounded-full border border-border bg-surface/95 py-2 pl-3 pr-4 shadow-md">
+            <span className="h-3 w-3 flex-shrink-0 rounded-full" style={{ backgroundColor: activeLeg.color }} />
+            <span className="text-sm font-medium text-text-primary">{activeLeg.label}</span>
+            <span className="text-sm font-semibold tabular-nums text-text-primary">
+              {activeLeg.distanceKm.toFixed(2)} km
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Sidebar */}
@@ -292,7 +302,7 @@ export default function NrrPage() {
               <span className="flex-1">
                 <span className="block font-medium text-text-primary">{leg.label}</span>
                 <span className="block text-sm text-text-secondary">
-                  {leg.distanceKm.toFixed(1)} km
+                  {leg.distanceKm.toFixed(2)} km
                 </span>
               </span>
             </button>
