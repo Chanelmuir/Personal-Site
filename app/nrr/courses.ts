@@ -1,5 +1,6 @@
 import courseData from './course-data.json'
 import { race } from './splits/data'
+import { splitIntoLanes, type LegPiece } from './overlaps'
 
 type Coord = [number, number, ...number[]]
 
@@ -33,6 +34,8 @@ export interface Course {
   changeovers: Changeover[]
   totalKm: number
   note: string | null
+  // Per leg, in the same order as legs: its stretches and which lane each sits in.
+  lanes: LegPiece[][]
 }
 
 const features = (courseData as unknown as { features: Feature[] }).features
@@ -103,6 +106,7 @@ function course(eventId: number, legs: CourseLeg[], repeats = 1, note: string | 
     changeovers: changeoversFor(legs),
     totalKm: legs.reduce((sum, leg) => sum + leg.distanceKm, 0) * repeats,
     note,
+    lanes: splitIntoLanes(legs),
   }
 }
 

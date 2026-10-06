@@ -9,9 +9,8 @@ import { race, rankSegment, segmentForLeg, formatTime } from './splits/data'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
-// [zoom, pixel width] stops: lines stay thin and tightly bundled when zoomed
-// out, and fan out as you zoom in, so the per-leg offset below (a multiple
-// of the width at each stop) never looks like a wide, disconnected gap.
+// [zoom, pixel width] stops: lines stay thin when zoomed out and thicken as
+// you zoom in.
 const WIDTH_STOPS: [number, number][] = [
   [8, 1.5],
   [11, 4],
@@ -24,11 +23,13 @@ function widthExpression(extra: number): ExpressionSpecification {
   return expr as unknown as ExpressionSpecification
 }
 
-function offsetExpression(indexFactor: number): ExpressionSpecification {
+// Each stretch is drawn `lane` line-widths off the route, so legs sharing a
+// road sit side by side at every zoom while lone legs stay on the road.
+const laneOffset = (() => {
   const expr: unknown[] = ['interpolate', ['linear'], ['zoom']]
-  WIDTH_STOPS.forEach(([zoom, width]) => expr.push(zoom, width * indexFactor))
+  WIDTH_STOPS.forEach(([zoom, width]) => expr.push(zoom, ['*', width, ['get', 'lane']]))
   return expr as unknown as ExpressionSpecification
-}
+})()
 
 function courseBounds(course: Course, legNumber: number | null = null) {
   const bounds = new mapboxgl.LngLatBounds()
@@ -102,14 +103,15 @@ export default function NrrPage() {
 
     course.legs.forEach((leg, index) => {
       const id = sourceId(course, leg.number)
-      const indexFactor = index - (course.legs.length - 1) / 2
-      const offset = offsetExpression(indexFactor)
       instance.addSource(id, {
         type: 'geojson',
         data: {
-          type: 'Feature',
-          properties: {},
-          geometry: { type: 'LineString', coordinates: leg.coordinates },
+          type: 'FeatureCollection',
+          features: course.lanes[index].map((piece) => ({
+            type: 'Feature',
+            properties: { lane: piece.lane },
+            geometry: { type: 'LineString', coordinates: piece.coordinates },
+          })),
         },
       })
       instance.addLayer({
@@ -121,7 +123,7 @@ export default function NrrPage() {
           'line-color': '#1c1917',
           'line-width': widthExpression(1),
           'line-opacity': 0.25,
-          'line-offset': offset,
+          'line-offset': laneOffset,
         },
       })
       instance.addLayer({
@@ -129,7 +131,7 @@ export default function NrrPage() {
         type: 'line',
         source: id,
         layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': leg.color, 'line-width': widthExpression(0), 'line-offset': offset },
+        paint: { 'line-color': leg.color, 'line-width': widthExpression(0), 'line-offset': laneOffset },
       })
     })
 
