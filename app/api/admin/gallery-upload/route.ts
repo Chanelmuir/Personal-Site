@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -6,10 +7,25 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-console.log('Service role key present:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
-console.log('Service role key length:', process.env.SUPABASE_SERVICE_ROLE_KEY?.length)
+// Compare without leaking how much of the password matched
+function isAuthorized(req: NextRequest): boolean {
+  const expected = process.env.ADMIN_UPLOAD_PASSWORD
+  const provided = req.headers.get('x-admin-password')
+  if (!expected || !provided) return false
+
+  const a = Buffer.from(provided)
+  const b = Buffer.from(expected)
+  return a.length === b.length && timingSafeEqual(a, b)
+}
 
 export async function POST(req: NextRequest) {
+  if (!process.env.ADMIN_UPLOAD_PASSWORD) {
+    return NextResponse.json({ error: 'Uploads are not configured' }, { status: 503 })
+  }
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
+  }
+
   const formData = await req.formData()
 
   const file = formData.get('file') as File | null
@@ -21,7 +37,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  const fileName = `${Date.now()}-${file.name}`
+  const latNum = parseFloat(lat)
+  const lngNum = parseFloat(lng)
+  if (!(Math.abs(latNum) <= 90) || !(Math.abs(lngNum) <= 180)) {
+    return NextResponse.json({ error: 'Invalid coordinates' }, { status: 400 })
+  }
+  if (!file.type.startsWith('image/')) {
+    return NextResponse.json({ error: 'File must be an image' }, { status: 400 })
+  }
+
+  const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
   const fileBuffer = await file.arrayBuffer()
 
   const { error: uploadError } = await supabaseAdmin.storage
@@ -39,8 +64,8 @@ export async function POST(req: NextRequest) {
     .from('gallery_game_photos')
     .insert({
       image_path: fileName,
-      lat: parseFloat(lat),
-      lng: parseFloat(lng),
+      lat: latNum,
+      lng: lngNum,
       description: description || null,
     })
 
