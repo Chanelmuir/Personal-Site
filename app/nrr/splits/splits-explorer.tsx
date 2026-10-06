@@ -177,7 +177,7 @@ export default function SplitsExplorer() {
                     {formatTime(r.seconds)}
                   </td>
                   <td className="hidden px-3 py-2.5 text-right tabular-nums text-text-secondary sm:table-cell">
-                    {formatPace(r.seconds, segment.km)}
+                    {formatPace(r.seconds, segment.paceHidden ? null : segment.km)}
                   </td>
                   <td className="hidden px-3 py-2.5 text-right tabular-nums text-text-secondary sm:table-cell">
                     {r.seconds === fastest ? '—' : `+${formatTime(r.seconds - fastest)}`}

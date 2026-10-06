@@ -7,6 +7,8 @@ export interface Segment {
   legs: number[]
   combined: boolean
   note: string | null
+  // The recorded times are wrong (but consistently so), so show no pace.
+  paceHidden: boolean
 }
 
 export interface Team {
