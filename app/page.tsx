@@ -1,22 +1,8 @@
 import Image from "next/image";
-import RouteSparkline from "./components/routeSparkline";
-import { getAllPostsMeta } from './lib/posts'
 import { getAllProjectsMeta } from './lib/projects'
 
 
-async function getRecentActivities() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/recent-activities`, {
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  const { activities } = await res.json()
-  return activities
-}
-
-
-export default async function Home() {
-  const recentActivities = await getRecentActivities()
-  const posts = getAllPostsMeta()
+export default function Home() {
   const projects = getAllProjectsMeta()
 
   return (
@@ -126,81 +112,6 @@ export default async function Home() {
                 </div>
               </div>
             ))}
-          </div>
-        </section>
-
-        {/* Writing & Activities */}
-        <section className="grid gap-12 border-t border-border py-16 sm:grid-cols-2 sm:gap-16">
-          {/* Writing */}
-          <div>
-            <h2 className="font-serif text-3xl text-text-primary">Writing</h2>
-            {posts.length > 0 ? (
-              <div className="mt-6 divide-y divide-border">
-                {posts.map((post) => (
-                  <a
-                    key={post.slug}
-                    href={`/posts/${post.slug}`}
-                    className="group block py-4 first:pt-0"
-                  >
-                    <h3 className="font-medium text-text-primary transition-colors group-hover:text-accent">
-                      {post.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-text-secondary">
-                      {new Date(post.date).toLocaleDateString('en-NZ')}
-                    </p>
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-6 text-sm text-text-secondary">Nothing published yet.</p>
-            )}
-          </div>
-
-          {/* Strava */}
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className="font-serif text-3xl text-text-primary">Recent Activities</h2>
-              <Image
-                src="/api_logo_pwrdBy_strava_horiz_orange.svg"
-                alt="Powered by Strava"
-                width={82}
-                height={16}
-                className="opacity-60"
-              />
-            </div>
-            {recentActivities.length > 0 ? (
-              <div className="mt-6 divide-y divide-border">
-                {recentActivities.map((activity: any) => (
-                  <a
-                    key={activity.id}
-                    href={`https://www.strava.com/activities/${activity.strava_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-4 py-4 first:pt-0"
-                  >
-                    <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-accent-light">
-                      <RouteSparkline route={activity.route} width={112} height={112} />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="truncate font-medium text-text-primary transition-colors group-hover:text-accent">
-                        {activity.name}
-                      </h3>
-                      <p className="mt-1 text-sm text-text-secondary">
-                        {new Date(activity.start_date).toLocaleDateString('en-NZ', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: '2-digit',
-                        })}
-                        {' · '}
-                        {(activity.distance_m / 1000).toFixed(1)} km
-                      </p>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-6 text-sm text-text-secondary">No recent activity.</p>
-            )}
           </div>
         </section>
       </main>
