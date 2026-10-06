@@ -80,9 +80,6 @@ export function rankSegment(event: RelayEvent, segmentIndex: number, category = 
   return list
 }
 
-export const sevenLegRelay = race.events.find((e) => e.legCount === 7)!
-
-// The course map is the seven leg course, where legs 6 and 7 are timed together.
-export function segmentForCourseLeg(leg: number): number {
-  return sevenLegRelay.segments.findIndex((s) => s.legs.includes(leg))
+export function segmentForLeg(event: RelayEvent, leg: number): number {
+  return event.segments.findIndex((s) => s.legs.includes(leg))
 }
