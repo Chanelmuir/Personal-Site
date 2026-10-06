@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import type { ExpressionSpecification } from 'mapbox-gl'
+import Link from 'next/link'
 import courseData from './course-data.json'
+import { sevenLegRelay, rankSegment, segmentForCourseLeg, formatTime } from './splits/data'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
@@ -227,7 +229,10 @@ export default function NrrPage() {
           </p>
           <h1 className="font-serif text-xl text-text-primary">2026 Course</h1>
           <p className="mt-1 text-sm text-text-secondary">
-            {legs.length} legs · {totalDistanceKm.toFixed(1)} km total
+            {legs.length} legs · {totalDistanceKm.toFixed(1)} km total ·{' '}
+            <Link href="/nrr/splits" className="text-accent hover:opacity-80">
+              Leg splits →
+            </Link>
           </p>
         </div>
         <div className="flex gap-3 overflow-x-auto px-4 py-3">
@@ -264,6 +269,9 @@ export default function NrrPage() {
           <p className="mt-2 text-sm text-text-secondary">
             {legs.length} legs · {totalDistanceKm.toFixed(1)} km total
           </p>
+          <Link href="/nrr/splits" className="mt-3 inline-block text-sm text-accent hover:opacity-80">
+            Who ran each leg fastest →
+          </Link>
         </div>
 
         <div className="flex flex-col divide-y divide-border">
@@ -289,6 +297,8 @@ export default function NrrPage() {
           ))}
         </div>
 
+        {selectedLeg !== null && <FastestOnLeg leg={selectedLeg} />}
+
         {selectedLeg !== null && (
           <button
             onClick={() => setSelectedLeg(null)}
@@ -306,5 +316,36 @@ export default function NrrPage() {
         </div>
       </aside>
     </main>
+  )
+}
+
+function FastestOnLeg({ leg }: { leg: number }) {
+  const index = segmentForCourseLeg(leg)
+  if (index < 0) return null
+  const segment = sevenLegRelay.segments[index]
+  const top = rankSegment(sevenLegRelay, index).slice(0, 3)
+
+  return (
+    <div className="border-b border-border p-6">
+      <p className="text-xs uppercase tracking-wide text-text-secondary">
+        Fastest on {segment.label.toLowerCase()} in 2026
+      </p>
+      <ol className="mt-3 flex flex-col gap-2">
+        {top.map((r) => (
+          <li key={r.team.id} className="flex items-baseline justify-between gap-3 text-sm">
+            <span className="min-w-0">
+              <span className="block font-medium text-text-primary">{r.runner ?? r.team.team}</span>
+              <span className="block text-xs text-text-secondary">{r.team.club ?? r.team.team}</span>
+            </span>
+            <span className="font-semibold tabular-nums text-text-primary">{formatTime(r.seconds)}</span>
+          </li>
+        ))}
+      </ol>
+      {segment.combined && (
+        <p className="mt-3 text-xs text-text-secondary">
+          Legs {segment.legs.join(' and ')} weren&apos;t timed separately, so this is their combined time.
+        </p>
+      )}
+    </div>
   )
 }
