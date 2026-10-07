@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import TeamExplorer from './team-explorer'
 import { race } from '../splits/data'
 
@@ -11,16 +10,7 @@ export const metadata: Metadata = {
 export default function TeamsPage() {
   return (
     <main className="max-w-5xl mx-auto w-full px-6 py-12 sm:px-16 sm:py-16">
-      <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-text-secondary">
-        <Link href="/nrr" className="hover:text-accent transition-colors">
-          ← Course map
-        </Link>
-        <Link href="/nrr/splits" className="hover:text-accent transition-colors">
-          Splits by leg
-        </Link>
-      </div>
-
-      <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
         {race.race} · 3 Oct 2026 · {race.venue}
       </p>
       <h1 className="mt-2 font-serif text-4xl tracking-tight text-text-primary sm:text-5xl">
