@@ -154,7 +154,9 @@ export default function SplitsExplorer() {
                 <th className="px-3 py-2.5 font-medium">#</th>
                 <th className="px-3 py-2.5 font-medium">Runner</th>
                 <th className="hidden px-3 py-2.5 font-medium sm:table-cell">Club · team</th>
-                <th className="px-3 py-2.5 text-right font-medium">Split</th>
+                <th className="px-3 py-2.5 text-right font-medium">
+                  Split<span className="sm:hidden"> · pace · gap</span>
+                </th>
                 <th className="hidden px-3 py-2.5 text-right font-medium sm:table-cell">Pace</th>
                 <th className="hidden px-3 py-2.5 text-right font-medium sm:table-cell">Gap</th>
               </tr>
@@ -173,8 +175,17 @@ export default function SplitsExplorer() {
                     {r.team.club && <span className="block text-text-primary">{r.team.club}</span>}
                     <span className="block text-xs">{r.team.team}</span>
                   </td>
-                  <td className="px-3 py-2.5 text-right font-semibold tabular-nums text-text-primary">
-                    {formatTime(r.seconds)}
+                  <td className="px-3 py-2.5 text-right tabular-nums">
+                    <span className="block font-semibold text-text-primary">{formatTime(r.seconds)}</span>
+                    {/* Phones have no room for the pace and gap columns, so they sit under the split. */}
+                    <span className="block whitespace-nowrap text-xs text-text-secondary sm:hidden">
+                      {[
+                        segment.paceHidden || !segment.km ? null : formatPace(r.seconds, segment.km),
+                        r.seconds === fastest ? null : `+${formatTime(r.seconds - fastest)}`,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
                   </td>
                   <td className="hidden px-3 py-2.5 text-right tabular-nums text-text-secondary sm:table-cell">
                     {formatPace(r.seconds, segment.paceHidden ? null : segment.km)}
