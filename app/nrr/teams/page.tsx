@@ -1,22 +1,22 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import SplitsExplorer from './splits-explorer'
-import { race } from './data'
+import TeamExplorer from './team-explorer'
+import { race } from '../splits/data'
 
 export const metadata: Metadata = {
-  title: 'Road relay splits · Chanel Muir',
-  description: 'Every leg split from the 2026 NZ Road Relay Champs, ranked fastest to slowest.',
+  title: 'Road relay team stats · Chanel Muir',
+  description: 'How every team moved through the field at the 2026 NZ Road Relay Champs, with head to head comparisons.',
 }
 
-export default function SplitsPage() {
+export default function TeamsPage() {
   return (
     <main className="max-w-5xl mx-auto w-full px-6 py-12 sm:px-16 sm:py-16">
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-text-secondary">
         <Link href="/nrr" className="hover:text-accent transition-colors">
           ← Course map
         </Link>
-        <Link href="/nrr/teams" className="hover:text-accent transition-colors">
-          Team stats →
+        <Link href="/nrr/splits" className="hover:text-accent transition-colors">
+          Splits by leg
         </Link>
       </div>
 
@@ -24,14 +24,13 @@ export default function SplitsPage() {
         {race.race} · 3 Oct 2026 · {race.venue}
       </p>
       <h1 className="mt-2 font-serif text-4xl tracking-tight text-text-primary sm:text-5xl">
-        Splits by leg
+        Team stats
       </h1>
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-text-secondary">
-        The official results only rank teams, so I pulled every runner&apos;s split off SportSplits to
-        see who was quickest on each leg.
+        Where each team sat after every changeover, and how any two teams stacked up leg by leg.
       </p>
 
-      <SplitsExplorer />
+      <TeamExplorer />
 
       <p className="mt-12 text-sm text-text-secondary">
         Source:{' '}
