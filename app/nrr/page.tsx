@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import mapboxgl from 'mapbox-gl'
 import type { ExpressionSpecification } from 'mapbox-gl'
 import { courses, type Course } from './courses'
@@ -210,19 +209,13 @@ export default function NrrPage() {
   const summary = `${course.legs.length === 1 ? '4 laps' : `${course.legs.length} legs`} · ${course.totalKm.toFixed(1)} km total`
 
   return (
-    <main className="flex flex-col sm:flex-row w-full h-[calc(100dvh-68px)] overflow-hidden">
+    <main className="flex flex-col sm:flex-row w-full h-[calc(100dvh-113px)] overflow-hidden">
       {/* Mobile header */}
       <div className="sm:hidden flex-shrink-0 border-b border-border bg-surface">
         <div className="px-4 pt-3">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
-            National Road Relays 2026
-          </p>
           <h1 className="font-serif text-xl text-text-primary">{course.name}</h1>
           <p className="mt-1 text-sm text-text-secondary">
-            {summary} ·{' '}
-            <Link href="/nrr/splits" className="text-accent hover:opacity-80">
-              Leg splits →
-            </Link>
+            {summary}
           </p>
         </div>
         <div className="flex gap-2 overflow-x-auto px-4 pt-3">
@@ -268,10 +261,7 @@ export default function NrrPage() {
       {/* Sidebar */}
       <aside className="hidden sm:flex w-full sm:w-[340px] flex-shrink-0 border-l border-border bg-surface flex-col overflow-y-auto">
         <div className="p-6 border-b border-border">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
-            National Road Relays 2026
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {courses.map((c) => (
               <button key={c.eventId} onClick={() => chooseCourse(c.eventId)} className={pill(c.eventId === courseId)}>
                 {c.name}
@@ -281,9 +271,6 @@ export default function NrrPage() {
           <h1 className="mt-4 font-serif text-3xl text-text-primary">{course.name}</h1>
           <p className="mt-2 text-sm text-text-secondary">{summary}</p>
           {course.note && <p className="mt-1 text-sm text-text-secondary">{course.note}</p>}
-          <Link href="/nrr/splits" className="mt-3 inline-block text-sm text-accent hover:opacity-80">
-            Who ran each leg fastest →
-          </Link>
         </div>
 
         <div className="flex flex-col divide-y divide-border">
