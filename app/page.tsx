@@ -23,26 +23,6 @@ export default function Home() {
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-secondary">
             A site for hosting hobby projects.
           </p>
-
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <a
-              href="https://github.com/chanelmuir"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-accent-light hover:text-accent"
-            >
-              <i className="fa-brands fa-github"></i>
-            </a>
-
-            <a
-              href="mailto:chanelkmuir@gmail.com"
-              aria-label="Email"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-accent-light hover:text-accent"
-            >
-              <i className="fa-solid fa-envelope text-sm" />
-            </a>
-          </div>
         </section>
 
         {/* Projects */}

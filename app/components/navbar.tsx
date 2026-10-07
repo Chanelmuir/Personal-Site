@@ -10,12 +10,24 @@ export default function Navbar() {
           chanelmuir.com
         </a>
         {/* Right (Navigation Links) */}
-        <div className="flex gap-6 text-sm text-text-secondary">
+        <div className="flex items-center gap-6 text-sm text-text-secondary">
           <a href="/gallery" className="hover:text-accent transition-colors">
             Gallery
           </a>
           <a href="/nrr" className="hover:text-accent transition-colors">
             NRR
+          </a>
+          <a
+            href="https://github.com/chanelmuir"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="hover:text-accent transition-colors"
+          >
+            <i className="fa-brands fa-github"></i>
+          </a>
+          <a href="mailto:chanelkmuir@gmail.com" aria-label="Email" className="hover:text-accent transition-colors">
+            <i className="fa-solid fa-envelope"></i>
           </a>
           {/* <a href="/contact" className="hover:text-accent">
             Contact
