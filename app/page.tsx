@@ -21,21 +21,10 @@ export default function Home() {
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-secondary">
-            Computer Science graduate building web applications, mapping tools,
-            and data-driven products.
+            A site for hosting hobby projects.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
-            <a
-              href="/resume.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm text-white transition-opacity hover:opacity-90"
-            >
-              <i className="fa-solid fa-file"></i>
-              Resume
-            </a>
-
             <a
               href="https://github.com/chanelmuir"
               target="_blank"
@@ -44,16 +33,6 @@ export default function Home() {
               className="inline-flex h-10 w-10 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-accent-light hover:text-accent"
             >
               <i className="fa-brands fa-github"></i>
-            </a>
-
-            <a
-              href="https://www.linkedin.com/in/chanelmuir/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-accent-light hover:text-accent"
-            >
-              <i className="fa-brands fa-linkedin"></i>
             </a>
 
             <a
