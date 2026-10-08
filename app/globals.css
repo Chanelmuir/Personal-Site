@@ -3,19 +3,20 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-background: #faf9f7;
-  --color-surface: #ffffff;
+  /* Map paper and ink: the homepage hero is a street map, and the rest of the site shares its colours */
+  --color-background: #eef0ea;
+  --color-surface: #f7f8f5;
 
-  --color-text-primary: #1c1917;
-  --color-text-secondary: #6b6560;
+  --color-text-primary: #17232b;
+  --color-text-secondary: #56636a;
 
-  --color-accent: #166534;
-  --color-accent-light: #dcfce7;
+  --color-accent: #2440e6;
+  --color-accent-light: #dfe4fd;
 
-  --color-border: #e7e3de;
+  --color-border: #d6dbd3;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
@@ -28,4 +29,11 @@ body {
 ::selection {
   background: var(--color-accent-light);
   color: var(--color-accent);
+}
+
+/* Headings use the wide cut of Archivo */
+.font-serif {
+  font-stretch: 115%;
+  font-weight: 700;
+  letter-spacing: -0.015em;
 }

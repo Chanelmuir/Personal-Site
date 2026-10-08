@@ -5,7 +5,7 @@ export default function Navbar() {
         {/* Left (Main Page) */}
         <a
           href="/"
-          className="font-serif text-lg italic tracking-tight text-text-primary hover:text-accent transition-colors"
+          className="font-serif text-lg text-text-primary hover:text-accent transition-colors"
         >
           chanelmuir.com
         </a>
