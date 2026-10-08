@@ -293,7 +293,7 @@ export default function StreetMapHero({ intro }: { intro: string }) {
                 <span>{scale.label}</span>
               </>
             )}
-            <span>CHCH, NZ</span>
+            <span>Christchurch, NZ</span>
           </div>
         </div>
       </div>
