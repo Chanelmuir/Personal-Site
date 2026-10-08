@@ -1,78 +1,82 @@
 import Image from "next/image";
-import { getAllProjectsMeta } from './lib/projects'
+import { getAllProjectsMeta, type ProjectMeta } from './lib/projects'
+import StreetMapHero from './components/street-map-hero'
 
+function ProjectLinks({ project }: { project: ProjectMeta }) {
+  if (!project.href && !project.repo) return null
+  return (
+    <div className="flex flex-wrap gap-x-5 gap-y-1 text-[15px] font-semibold text-accent">
+      {project.href && (
+        <a
+          href={project.href}
+          {...(project.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          className="underline underline-offset-[3px] hover:text-text-primary">
+          Open {project.name}
+        </a>
+      )}
+      {project.repo && (
+        <a href={project.repo} target="_blank" rel="noopener noreferrer" className="underline underline-offset-[3px] hover:text-text-primary">
+          Source
+        </a>
+      )}
+    </div>
+  )
+}
+
+function Screenshot({ project, wide }: { project: ProjectMeta; wide?: boolean }) {
+  return (
+    <a
+      href={`/projects/${project.slug}`}
+      tabIndex={-1}
+      aria-hidden="true"
+      className={`block overflow-hidden border border-border bg-surface ${wide ? 'aspect-[16/10]' : 'aspect-[4/3]'}`}
+    >
+      <Image
+        src={project.image}
+        alt=""
+        width={wide ? 1200 : 600}
+        height={wide ? 750 : 450}
+        className="h-full w-full object-cover object-left-top"
+      />
+    </a>
+  )
+}
 
 export default function Home() {
-  const projects = getAllProjectsMeta()
+  const [lead, ...rest] = getAllProjectsMeta()
 
   return (
-    <div className="relative overflow-x-hidden">
-      <div className="absolute inset-x-0 top-0 -z-10 h-100 pointer-events-none bg-[radial-gradient(circle_at_top_left,var(--color-accent-light)_0%,transparent_65%)] opacity-40 blur-3xl" />
+    <div className="overflow-x-hidden">
+      <StreetMapHero intro="A site for hosting hobby projects." />
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col px-6 py-8 sm:px-16">
+      <main className="mx-auto w-full max-w-6xl px-6 pt-18 pb-24 sm:px-16">
+        <h2 className="font-serif text-3xl text-text-primary">Projects</h2>
 
-        {/* Intro */}
-        <section className="py-20 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
-            Christchurch, New Zealand
-          </p>
-          <h1 className="mt-4 font-serif text-6xl tracking-tight text-text-primary sm:text-7xl">
-            Chanel Muir
-          </h1>
+        {lead && (
+          <article className="mt-9 grid items-end gap-5 md:grid-cols-[1.55fr_1fr] md:gap-9">
+            <Screenshot project={lead} wide />
+            <div className="flex min-w-0 flex-col gap-3">
+              <h3 className="text-[clamp(30px,4vw,44px)] font-bold leading-none tracking-[-0.02em] text-text-primary [font-stretch:125%]">
+                <a href={`/projects/${lead.slug}`} className="hover:text-accent">{lead.name}</a>
+              </h3>
+              <p className="max-w-[46ch] text-lg leading-relaxed text-text-primary">{lead.tagline}</p>
+              <ProjectLinks project={lead} />
+            </div>
+          </article>
+        )}
 
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-secondary">
-            A site for hosting hobby projects.
-          </p>
-        </section>
-
-        {/* Projects */}
-        <section className="border-t border-border py-16">
-          <h2 className="font-serif text-3xl text-text-primary">Projects</h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-3">
-            {projects.map((project) => (
-              <div
-                key={project.slug}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/50"
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={project.name}
-                    width={600}
-                    height={450}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-serif text-lg text-text-primary">
-                      {/* Stretched link: the whole card opens the project page */}
-                      <a href={`/projects/${project.slug}`} className="after:absolute after:inset-0">
-                        {project.name}
-                      </a>
-                    </h3>
-                    {project.href && (
-                      <a href={project.href} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name}`} className="relative z-10 text-text-secondary hover:text-accent">
-                        <i className="fa-solid fa-arrow-up-right-from-square text-xs" />
-                      </a>
-                    )}
-                    {project.repo && (
-                      <a href={project.repo} target="_blank" rel="noopener noreferrer" aria-label={`${project.name} source`} className="relative z-10 text-text-secondary hover:text-accent">
-                        <i className="fa-brands fa-github"></i>
-                      </a>
-                    )}
-                  </div>
-                  <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                    {project.tagline}
-                  </p>
-                  <p className="mt-4 text-xs uppercase tracking-wide text-text-secondary">
-                    {project.tags.join(" · ")}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <div className="mt-14 grid gap-12 md:grid-cols-3 md:gap-9">
+          {rest.map((project) => (
+            <article key={project.slug} className="flex min-w-0 flex-col gap-3">
+              <Screenshot project={project} />
+              <h3 className="mt-1.5 font-serif text-[22px] text-text-primary">
+                <a href={`/projects/${project.slug}`} className="hover:text-accent">{project.name}</a>
+              </h3>
+              <p className="leading-relaxed text-text-secondary">{project.tagline}</p>
+              <ProjectLinks project={project} />
+            </article>
+          ))}
+        </div>
       </main>
     </div>
   );
