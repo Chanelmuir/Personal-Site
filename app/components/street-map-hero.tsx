@@ -10,11 +10,11 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 // Kept in step with the theme in globals.css
 const colors = {
   paper: '#eef0ea',
-  park: '#d8e5cc',
+  park: '#dde6d3',
   water: '#b6d0cc',
-  building: '#e3e6de',
+  building: '#e8ebe4',
   street: '#cdd3cb',
-  mainRoad: '#bcc4bb',
+  mainRoad: '#c4cbc3',
   route: '#2440e6',
 }
 
@@ -91,7 +91,7 @@ const style: StyleSpecification = {
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
         'line-color': colors.street,
-        'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.6, 14, 1.5, 17, 5],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.7, 14, 1.75, 17, 5.5],
       },
     },
     // Main roads, like the Four Avenues, sit a step heavier than side streets
@@ -104,7 +104,7 @@ const style: StyleSpecification = {
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
         'line-color': colors.mainRoad,
-        'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.4, 14, 3.5, 17, 9],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.1, 14, 2.75, 17, 7.5],
       },
     },
   ],
