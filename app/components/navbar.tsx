@@ -11,10 +11,10 @@ export default function Navbar() {
         </a>
         {/* Right (Navigation Links) */}
         <div className="flex items-center gap-6 text-sm text-text-secondary">
-          <a href="/gallery" className="hover:text-accent transition-colors">
+          <a href="/gallery" className="run-link hover:text-accent transition-colors">
             Gallery
           </a>
-          <a href="/nrr" className="hover:text-accent transition-colors">
+          <a href="/nrr" className="run-link hover:text-accent transition-colors">
             NRR
           </a>
           <a

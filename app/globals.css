@@ -37,3 +37,59 @@ body {
   font-weight: 700;
   letter-spacing: -0.015em;
 }
+
+/* Text links: on hover a little runner crosses the link and draws its underline */
+.run-link {
+  --stride-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='2.6' r='1.9' fill='black' stroke='none'/%3E%3Cpath d='M9.6 5.2 7.6 9.6'/%3E%3Cpath d='M9.2 6 11.6 7.8 13.4 6.6M9.2 6 6.6 6.8 5.2 8.8'/%3E%3Cpath d='M7.6 9.6 10.2 11.8 9.6 15M7.6 9.6 5.6 12.2 2.4 12.6'/%3E%3C/svg%3E");
+  --stride-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='2.6' r='1.9' fill='black' stroke='none'/%3E%3Cpath d='M9.6 5.2 7.6 9.6'/%3E%3Cpath d='M9.2 6 10.4 8.6 12.4 9.2M9.2 6 7.4 7.6 7.8 10'/%3E%3Cpath d='M7.6 9.6 8.6 12.6 6.4 15M7.6 9.6 9.8 11.6 12.4 12.8'/%3E%3C/svg%3E");
+  position: relative;
+  padding-bottom: 3px;
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor), linear-gradient(var(--rest-line, transparent), var(--rest-line, transparent));
+  background-position: 0 100%, 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0 1.5px, 100% 1px;
+  transition: background-size 0.2s ease, color 0.15s ease;
+}
+
+.run-link::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  width: 0.8em;
+  height: 0.8em;
+  background-color: currentColor;
+  mask: var(--stride-a) center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.run-link:hover,
+.run-link:focus-visible {
+  background-size: 100% 1.5px, 100% 1px;
+  transition: background-size 0.6s linear, color 0.15s ease;
+}
+
+.run-link:hover::after,
+.run-link:focus-visible::after {
+  animation: run-across 0.6s linear forwards, run-stride 0.18s steps(1) infinite;
+}
+
+@keyframes run-across {
+  0% { left: 0; opacity: 1; transform: translateX(-50%); }
+  85% { opacity: 1; }
+  100% { left: 100%; opacity: 0; transform: translateX(-50%); }
+}
+
+@keyframes run-stride {
+  0% { mask-image: var(--stride-a); }
+  50% { mask-image: var(--stride-b); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .run-link:hover,
+  .run-link:focus-visible { transition: none; }
+  .run-link:hover::after,
+  .run-link:focus-visible::after { animation: none; }
+}
