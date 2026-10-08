@@ -48,14 +48,14 @@ body {
   background-image: linear-gradient(currentColor, currentColor), linear-gradient(var(--rest-line, transparent), var(--rest-line, transparent));
   background-position: 0 100%, 0 100%;
   background-repeat: no-repeat;
-  background-size: 0 1.5px, 100% 1px;
+  background-size: 0 var(--run-line, 1.5px), 100% 1px;
   transition: background-size 0.2s ease, color 0.15s ease;
 }
 
 .run-link::after {
   content: "";
   position: absolute;
-  bottom: 1px;
+  bottom: var(--runner-bottom, 1px);
   left: 0;
   width: 0.8em;
   height: 0.8em;
@@ -67,7 +67,7 @@ body {
 
 .run-link:hover,
 .run-link:focus-visible {
-  background-size: 100% 1.5px, 100% 1px;
+  background-size: 100% var(--run-line, 1.5px), 100% 1px;
   transition: background-size 0.6s linear, color 0.15s ease;
 }
 

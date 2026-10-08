@@ -10,6 +10,7 @@ const TABS = [
 ]
 
 // One set of tabs shared by every NRR page, so each is a click from the others.
+// Hovering a tab sends the runner along its bottom edge, drawing a line where the active tab's border sits.
 export default function NrrNav() {
   const pathname = usePathname()
   return (
@@ -28,7 +29,7 @@ export default function NrrNav() {
               className={`flex items-center whitespace-nowrap border-b-2 text-sm font-medium transition-colors ${
                 active
                   ? 'border-text-primary text-text-primary'
-                  : 'border-transparent text-text-secondary hover:text-accent'
+                  : 'run-link border-transparent text-text-secondary hover:text-accent [--run-line:2px] [--runner-bottom:-1px] [background-origin:border-box]'
               }`}
             >
               {tab.label}
