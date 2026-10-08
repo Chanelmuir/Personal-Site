@@ -77,9 +77,9 @@ body {
 }
 
 @keyframes run-across {
-  0% { left: 0; opacity: 1; transform: translateX(-70%); }
+  0% { left: 0; opacity: 1; transform: translateX(-50%); }
   85% { opacity: 1; }
-  100% { left: 100%; opacity: 0; transform: translateX(-70%); }
+  100% { left: 100%; opacity: 0; transform: translateX(-50%); }
 }
 
 @keyframes run-stride {
