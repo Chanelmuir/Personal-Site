@@ -47,7 +47,7 @@ export default function Home() {
 
   return (
     <div className="overflow-x-hidden">
-      <StreetMapHero intro="A site for hosting hobby projects." />
+      <StreetMapHero intro="A site for hosting my hobby projects." />
 
       <main className="mx-auto w-full max-w-6xl px-6 pt-18 pb-24 sm:px-16">
         <h2 className="font-serif text-3xl text-text-primary">Projects</h2>
