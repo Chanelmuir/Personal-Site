@@ -10,9 +10,11 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 // Kept in step with the theme in globals.css
 const colors = {
   paper: '#eef0ea',
-  park: '#e2e8da',
+  park: '#d8e5cc',
   water: '#b6d0cc',
+  building: '#e3e6de',
   street: '#cdd3cb',
+  mainRoad: '#bcc4bb',
   route: '#2440e6',
 }
 
@@ -24,9 +26,10 @@ const RUN = routeCoords as LngLat[]
 // Middle of Hagley Park, from Deans Ave to Rolleston Ave
 const HAGLEY_PARK_LNG = 172.6195
 
-const ROAD_CLASSES = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'street', 'street_limited', 'service']
+const MAIN_ROADS = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary']
+const SIDE_STREETS = ['street', 'street_limited', 'service']
 
-// A bare street map: no labels, no buildings, just streets, parks and the Avon.
+// A bare street map: no labels, just streets, faint buildings, parks and the Avon.
 const style: StyleSpecification = {
   version: 8,
   sources: {
@@ -73,15 +76,35 @@ const style: StyleSpecification = {
       },
     },
     {
-      id: 'roads',
+      id: 'buildings',
+      type: 'fill',
+      source: 'streets',
+      'source-layer': 'building',
+      paint: { 'fill-color': colors.building },
+    },
+    {
+      id: 'side-streets',
       type: 'line',
       source: 'streets',
       'source-layer': 'road',
-      filter: ['in', ['get', 'class'], ['literal', ROAD_CLASSES]],
+      filter: ['in', ['get', 'class'], ['literal', SIDE_STREETS]],
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
         'line-color': colors.street,
-        'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.8, 14, 2, 17, 6],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.6, 14, 1.5, 17, 5],
+      },
+    },
+    // Main roads, like the Four Avenues, sit a step heavier than side streets
+    {
+      id: 'main-roads',
+      type: 'line',
+      source: 'streets',
+      'source-layer': 'road',
+      filter: ['in', ['get', 'class'], ['literal', MAIN_ROADS]],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': colors.mainRoad,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 12, 1.4, 14, 3.5, 17, 9],
       },
     },
   ],
