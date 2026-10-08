@@ -132,8 +132,8 @@ export default function StreetMapHero({ intro }: { intro: string }) {
     const map = new mapboxgl.Map({
       container: el,
       style,
-      bounds: area,
-      fitBoundsOptions: { padding: padding(el) },
+      center: area.getCenter(),
+      zoom: 13,
       interactive: false,
       attributionControl: false,
     })
@@ -142,11 +142,18 @@ export default function StreetMapHero({ intro }: { intro: string }) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let frame = 0
 
+    // Fit the run beside the title block, then step back a zoom level so Hagley Park,
+    // the Avon and the Four Avenues around it show it's Christchurch
     const refit = () => {
       map.resize()
-      map.fitBounds(area, { padding: padding(el), animate: false })
+      const pad = padding(el)
+      map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 })
+      const fit = map.cameraForBounds(area, { padding: pad })
+      map.setPadding(pad)
+      map.jumpTo({ center: area.getCenter(), zoom: (fit?.zoom ?? 14) - 1 })
       setScale(scaleFor(map))
     }
+    refit()
     const observer = new ResizeObserver(refit)
     observer.observe(el)
 
