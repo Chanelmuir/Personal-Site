@@ -10,12 +10,12 @@ function ProjectLinks({ project }: { project: ProjectMeta }) {
         <a
           href={project.href}
           {...(project.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className="underline underline-offset-[3px] hover:text-text-primary">
+          className="run-link [--rest-line:color-mix(in_srgb,currentColor_35%,transparent)] hover:text-text-primary">
           Open {project.name}
         </a>
       )}
       {project.repo && (
-        <a href={project.repo} target="_blank" rel="noopener noreferrer" className="underline underline-offset-[3px] hover:text-text-primary">
+        <a href={project.repo} target="_blank" rel="noopener noreferrer" className="run-link [--rest-line:color-mix(in_srgb,currentColor_35%,transparent)] hover:text-text-primary">
           Source
         </a>
       )}
