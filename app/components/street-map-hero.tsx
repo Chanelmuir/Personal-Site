@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import type { GeoJSONSource, StyleSpecification } from 'mapbox-gl'
+import routeCoords from './home-route.json'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
@@ -12,36 +13,13 @@ const colors = {
   park: '#e2e8da',
   water: '#b6d0cc',
   street: '#cdd3cb',
-  collected: '#a7b3ee',
   route: '#2440e6',
 }
 
 type LngLat = [number, number]
 
-// Waypoints around the central city. Mapbox snaps each run onto real streets and paths.
-const RUN: LngLat[] = [
-  [172.637, -43.531], // Cathedral Square
-  [172.6355, -43.5285], // Victoria Square
-  [172.629, -43.5245], // Park Terrace
-  [172.618, -43.5235], // Hagley Park North
-  [172.615, -43.529],
-  [172.627, -43.532], // Rolleston Avenue
-  [172.637, -43.531],
-]
-const EARLIER_RUNS: LngLat[][] = [
-  [
-    [172.6435, -43.532], // Latimer Square
-    [172.653, -43.53], // Fitzgerald Avenue
-    [172.648, -43.526],
-    [172.6355, -43.5285],
-  ],
-  [
-    [172.623, -43.535], // Hagley Park South
-    [172.617, -43.538],
-    [172.63, -43.54], // Moorhouse Avenue
-    [172.637, -43.536],
-  ],
-]
+// Chanel's own GPS art run through the central city (13.6 km), spelling out the name
+const RUN = routeCoords as LngLat[]
 
 const ROAD_CLASSES = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'street', 'street_limited', 'service']
 
@@ -121,19 +99,6 @@ function padding(el: HTMLElement) {
     : { top: 40, right: 40, bottom: h * 0.2, left: w * 0.32 }
 }
 
-async function route(points: LngLat[]): Promise<LngLat[] | null> {
-  const coords = points.map((p) => p.join(',')).join(';')
-  const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${coords}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`
-  try {
-    const res = await fetch(url)
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.routes?.[0]?.geometry?.coordinates ?? null
-  } catch {
-    return null
-  }
-}
-
 const line = (coordinates: LngLat[]): GeoJSON.Feature<GeoJSON.LineString> => ({
   type: 'Feature',
   properties: {},
@@ -163,7 +128,7 @@ export default function StreetMapHero({ intro }: { intro: string }) {
     const el = container.current
     if (!el) return
 
-    const area = bounds([...RUN, ...EARLIER_RUNS.flat()])
+    const area = bounds(RUN)
     const map = new mapboxgl.Map({
       container: el,
       style,
@@ -176,7 +141,6 @@ export default function StreetMapHero({ intro }: { intro: string }) {
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let frame = 0
-    let cancelled = false
 
     const refit = () => {
       map.resize()
@@ -186,19 +150,11 @@ export default function StreetMapHero({ intro }: { intro: string }) {
     const observer = new ResizeObserver(refit)
     observer.observe(el)
 
-    map.on('load', async () => {
+    map.on('load', () => {
       setScale(scaleFor(map))
       const empty: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] }
-      map.addSource('collected', { type: 'geojson', data: empty })
       map.addSource('run', { type: 'geojson', data: empty })
       map.addSource('ends', { type: 'geojson', data: empty })
-      map.addLayer({
-        id: 'collected',
-        type: 'line',
-        source: 'collected',
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': colors.collected, 'line-width': 3 },
-      })
       map.addLayer({
         id: 'run',
         type: 'line',
@@ -218,13 +174,7 @@ export default function StreetMapHero({ intro }: { intro: string }) {
         },
       })
 
-      const [run, ...earlier] = await Promise.all([route(RUN), ...EARLIER_RUNS.map(route)])
-      if (cancelled) return
-
-      const done = earlier.filter((r): r is LngLat[] => r !== null)
-      ;(map.getSource('collected') as GeoJSONSource).setData({ type: 'FeatureCollection', features: done.map(line) })
-      if (!run) return
-
+      const run = RUN
       const runSource = map.getSource('run') as GeoJSONSource
       const endsSource = map.getSource('ends') as GeoJSONSource
       const draw = (coords: LngLat[]) => {
@@ -243,8 +193,8 @@ export default function StreetMapHero({ intro }: { intro: string }) {
         return
       }
 
-      // Draw today's run once, easing out as it reaches the finish
-      const duration = 4200
+      // Draw the run once, easing out as it reaches the finish
+      const duration = 7000
       let start: number | null = null
       const step = (now: number) => {
         if (start === null) start = now
@@ -257,7 +207,6 @@ export default function StreetMapHero({ intro }: { intro: string }) {
     })
 
     return () => {
-      cancelled = true
       cancelAnimationFrame(frame)
       observer.disconnect()
       map.remove()
