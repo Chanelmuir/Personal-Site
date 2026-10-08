@@ -43,7 +43,7 @@ body {
   --stride-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='2.6' r='1.9' fill='black' stroke='none'/%3E%3Cpath d='M9.6 5.2 7.6 9.6'/%3E%3Cpath d='M9.2 6 11.6 7.8 13.4 6.6M9.2 6 6.6 6.8 5.2 8.8'/%3E%3Cpath d='M7.6 9.6 10.2 11.8 9.6 15M7.6 9.6 5.6 12.2 2.4 12.6'/%3E%3C/svg%3E");
   --stride-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='2.6' r='1.9' fill='black' stroke='none'/%3E%3Cpath d='M9.6 5.2 7.6 9.6'/%3E%3Cpath d='M9.2 6 10.4 8.6 12.4 9.2M9.2 6 7.4 7.6 7.8 10'/%3E%3Cpath d='M7.6 9.6 8.6 12.6 6.4 15M7.6 9.6 9.8 11.6 12.4 12.8'/%3E%3C/svg%3E");
   position: relative;
-  padding-bottom: 3px;
+  padding-bottom: var(--run-gap, 3px);
   text-decoration: none;
   background-image: linear-gradient(currentColor, currentColor), linear-gradient(var(--rest-line, transparent), var(--rest-line, transparent));
   background-position: 0 100%, 0 100%;

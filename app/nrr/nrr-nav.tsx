@@ -16,7 +16,7 @@ export default function NrrNav() {
   return (
     <nav aria-label="Road relays" className="flex-shrink-0 border-b border-border bg-background">
       <div className="mx-auto flex h-11 w-full max-w-6xl items-stretch gap-6 overflow-x-auto px-6 sm:px-16">
-        <span className="hidden items-center text-xs font-medium uppercase tracking-[0.2em] text-text-secondary sm:flex">
+        <span className="hidden items-center border-b-2 border-transparent text-xs font-medium uppercase tracking-[0.2em] text-text-secondary sm:flex">
           Road Relays 2026
         </span>
         {TABS.map((tab) => {
@@ -29,7 +29,7 @@ export default function NrrNav() {
               className={`flex items-center whitespace-nowrap border-b-2 text-sm font-medium transition-colors ${
                 active
                   ? 'border-text-primary text-text-primary'
-                  : 'run-link border-transparent text-text-secondary hover:text-accent [--run-line:2px] [--runner-bottom:-1px] [background-origin:border-box]'
+                  : 'run-link border-transparent text-text-secondary hover:text-accent [--run-gap:0px] [--run-line:2px] [--runner-bottom:-1px] [background-origin:border-box]'
               }`}
             >
               {tab.label}

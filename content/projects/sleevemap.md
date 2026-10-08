@@ -20,8 +20,3 @@ So I rebuilt it properly.
 - Plan new routes with snap-to-road routing, switch between running and cycling profiles per segment, and export to GPX
 - Overlay your friends' heatmaps while planning, so a group run can hit everyone's missing streets
 
-## The fun parts
-
-- **Moving from "download everything on every visit" to a real database.** Activities live in Postgres with PostGIS, stored as `LINESTRING` geometries, and the maps read straight from there.
-- **Keeping it live with webhooks.** Strava pushes new activities to the app, so a run shows up on the map without anyone pressing sync.
-- **Surviving an API change.** When Strava started charging for API access, I switched sync off behind one flag. Every map, profile and the planner kept working from the data already stored.
