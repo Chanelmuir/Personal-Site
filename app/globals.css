@@ -71,6 +71,10 @@ body {
   transition: background-size 0.6s linear, color 0.15s ease;
 }
 
+.run-link[aria-current='page'] {
+  background-size: 100% var(--run-line, 1.5px), 100% 1px;
+}
+
 .run-link:hover::after,
 .run-link:focus-visible::after {
   animation: run-across 0.6s linear forwards, run-stride 0.18s steps(1) infinite;
