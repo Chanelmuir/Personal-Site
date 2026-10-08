@@ -266,7 +266,10 @@ export default function StreetMapHero({ intro }: { intro: string }) {
 
   return (
     <section aria-label="Introduction" className="relative h-[clamp(440px,64vh,620px)] overflow-hidden bg-background">
-      <div ref={container} aria-hidden="true" className="absolute inset-0" />
+      {/* Mapbox's own CSS makes its container position: relative, so the map sits inside an absolute wrapper */}
+      <div aria-hidden="true" className="absolute inset-0">
+        <div ref={container} className="h-full w-full" />
+      </div>
 
       <div className="pointer-events-none relative mx-auto flex h-full w-full max-w-6xl items-end px-6 py-8 sm:px-16">
         <div className="pointer-events-auto max-w-full border-[1.5px] border-text-primary bg-background px-5 pt-5 pb-4 sm:px-7 sm:pt-6 sm:pb-5">
@@ -290,7 +293,7 @@ export default function StreetMapHero({ intro }: { intro: string }) {
                 <span>{scale.label}</span>
               </>
             )}
-            <span>Ōtautahi Christchurch</span>
+            <span>CHCH, NZ</span>
           </div>
         </div>
       </div>
