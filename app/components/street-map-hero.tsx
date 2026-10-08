@@ -142,7 +142,7 @@ export default function StreetMapHero({ intro }: { intro: string }) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let frame = 0
 
-    // Fit the run beside the title block, then step back about a zoom and a half so Hagley Park,
+    // Fit the run beside the title block, then step back a zoom level so Hagley Park,
     // the Avon and the Four Avenues around it show it's Christchurch
     const refit = () => {
       map.resize()
@@ -150,7 +150,7 @@ export default function StreetMapHero({ intro }: { intro: string }) {
       map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 })
       const fit = map.cameraForBounds(area, { padding: pad })
       map.setPadding(pad)
-      map.jumpTo({ center: area.getCenter(), zoom: (fit?.zoom ?? 14) - 1.4 })
+      map.jumpTo({ center: area.getCenter(), zoom: (fit?.zoom ?? 14) - 1 })
       // Nudge the view south so the run sits higher, clear of the title block
       map.panBy([0, el.clientHeight * 0.08], { animate: false })
       setScale(scaleFor(map))
