@@ -21,6 +21,9 @@ type LngLat = [number, number]
 // Chanel's own GPS art run through the central city (13.6 km), spelling out the name
 const RUN = routeCoords as LngLat[]
 
+// Middle of Hagley Park, from Deans Ave to Rolleston Ave
+const HAGLEY_PARK_LNG = 172.6195
+
 const ROAD_CLASSES = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'street', 'street_limited', 'service']
 
 // A bare street map: no labels, no buildings, just streets, parks and the Avon.
@@ -122,6 +125,7 @@ function scaleFor(map: mapboxgl.Map) {
 
 export default function StreetMapHero({ intro }: { intro: string }) {
   const container = useRef<HTMLDivElement>(null)
+  const titleBlock = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState<{ px: number; label: string } | null>(null)
 
   useEffect(() => {
@@ -142,17 +146,33 @@ export default function StreetMapHero({ intro }: { intro: string }) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let frame = 0
 
-    // Fit the run beside the title block, then step back a zoom level so Hagley Park,
-    // the Avon and the Four Avenues around it show it's Christchurch
+    // Phones: fit the run beside the title block, then step back a zoom level so Hagley Park,
+    // the Avon and the Four Avenues around it show it's Christchurch.
+    // Wider screens: Hagley Park in the middle, zoomed so the run ends under the navbar's last icon.
+    // Either way the run sits vertically centred in the space above the title block.
     const refit = () => {
       map.resize()
-      const pad = padding(el)
+      const w = el.clientWidth
+      const boxTop = titleBlock.current?.offsetTop ?? el.clientHeight * 0.6
       map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 })
-      const fit = map.cameraForBounds(area, { padding: pad })
-      map.setPadding(pad)
-      map.jumpTo({ center: area.getCenter(), zoom: (fit?.zoom ?? 14) - 1 })
-      // Nudge the view south so the run sits higher, clear of the title block
-      map.panBy([0, el.clientHeight * 0.08], { animate: false })
+      if (w < 640) {
+        const pad = padding(el)
+        const fit = map.cameraForBounds(area, { padding: pad })
+        map.setPadding(pad)
+        map.jumpTo({ center: area.getCenter(), zoom: (fit?.zoom ?? 14) - 1 })
+        const ne = map.project(area.getNorthEast())
+        const sw = map.project(area.getSouthWest())
+        map.panBy([(ne.x + sw.x) / 2 - w / 2, (ne.y + sw.y) / 2 - boxTop / 2], { animate: false })
+      } else {
+        // The navbar's right edge: max-w-6xl column with sm:px-16
+        const contentRight = (w + Math.min(w, 1152)) / 2 - 64
+        const pxPerDegree = (contentRight - w / 2) / (area.getEast() - HAGLEY_PARK_LNG)
+        const zoom = Math.log2((pxPerDegree * 360) / 512)
+        map.jumpTo({ center: [HAGLEY_PARK_LNG, area.getCenter().lat], zoom })
+        const ne = map.project(area.getNorthEast())
+        const sw = map.project(area.getSouthWest())
+        map.panBy([0, (ne.y + sw.y) / 2 - boxTop / 2], { animate: false })
+      }
       setScale(scaleFor(map))
     }
     refit()
@@ -230,7 +250,7 @@ export default function StreetMapHero({ intro }: { intro: string }) {
       </div>
 
       <div className="pointer-events-none relative mx-auto flex h-full w-full max-w-6xl items-end px-6 py-8 sm:px-16">
-        <div className="pointer-events-auto max-w-full border-[1.5px] border-text-primary bg-background px-4 pt-4 pb-3 sm:px-5 sm:pt-4 sm:pb-4">
+        <div ref={titleBlock} className="pointer-events-auto max-w-full border-[1.5px] border-text-primary bg-background px-4 pt-4 pb-3 sm:px-5 sm:pt-4 sm:pb-4">
           <h1 className="text-[clamp(34px,6vw,68px)] font-extrabold leading-[0.88] tracking-[-0.035em] text-text-primary [font-stretch:125%]">
             Chanel Muir
           </h1>
