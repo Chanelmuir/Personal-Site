@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import activities from './activities.json'
 import TrainingExplorer, { type YearTotal } from './training-explorer'
+import { dailyTotals, monthlyPace, weeklyTotals, type Run } from './stats'
 
 export const metadata: Metadata = {
   title: 'Every run since 2018 | Chanel Muir',
@@ -18,6 +19,7 @@ export default function TrainingPage() {
   const runs = all.filter((a) => a[1] === 'Run')
   const longest = Math.max(...runs.map((a) => a[2]))
   const first = runs[0][0]
+  const runList: Run[] = runs.map(([date, , km, secs]) => ({ date, km, secs }))
 
   const byYear = new Map<number, YearTotal>()
   for (const [date, , km] of runs) {
@@ -56,7 +58,12 @@ export default function TrainingPage() {
         </dl>
       </header>
 
-      <TrainingExplorer years={years} />
+      <TrainingExplorer
+        years={years}
+        weeks={weeklyTotals(runList)}
+        days={dailyTotals(runList)}
+        paces={monthlyPace(runList)}
+      />
     </div>
   )
 }

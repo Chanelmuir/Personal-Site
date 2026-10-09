@@ -2,13 +2,22 @@
 
 import { useState } from 'react'
 import TrainingMap from './training-map'
+import WeeklyChart from './weekly-chart'
+import RunCalendar from './run-calendar'
+import PaceChart from './pace-chart'
+import type { MonthPace, Week } from './stats'
 
 export type YearTotal = { year: number; km: number; runs: number; partial?: string }
 
 const fmt = new Intl.NumberFormat('en-NZ')
 
 // The year buttons and the distance chart both pick which year the map shows
-export default function TrainingExplorer({ years }: { years: YearTotal[] }) {
+type Props = { years: YearTotal[]; weeks: Week[]; days: Record<string, number>; paces: MonthPace[] }
+
+const section = 'mx-auto w-full max-w-6xl px-6 pt-16 sm:px-16'
+const heading = 'font-serif text-2xl text-text-primary'
+
+export default function TrainingExplorer({ years, weeks, days, paces }: Props) {
   const [year, setYear] = useState<number | null>(null)
   const max = Math.max(...years.map((y) => y.km))
 
@@ -39,8 +48,8 @@ export default function TrainingExplorer({ years }: { years: YearTotal[] }) {
         <TrainingMap year={year} />
       </div>
 
-      <section className="mx-auto w-full max-w-6xl px-6 pt-16 sm:px-16" aria-labelledby="by-year">
-        <h2 id="by-year" className="font-serif text-2xl text-text-primary">
+      <section className={section} aria-labelledby="by-year">
+        <h2 id="by-year" className={heading}>
           Running distance by year
         </h2>
         <div className="mt-8 flex h-56 items-end gap-1.5 border-b border-text-primary sm:gap-3">
@@ -80,6 +89,27 @@ export default function TrainingExplorer({ years }: { years: YearTotal[] }) {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className={section} aria-labelledby="by-week">
+        <h2 id="by-week" className={heading}>
+          Weekly distance
+        </h2>
+        <WeeklyChart weeks={weeks} year={year} />
+      </section>
+
+      <section className={section} aria-labelledby="calendar">
+        <h2 id="calendar" className={heading}>
+          Run calendar
+        </h2>
+        <RunCalendar days={days} year={year ?? years[years.length - 1].year} />
+      </section>
+
+      <section className={section} aria-labelledby="pace">
+        <h2 id="pace" className={heading}>
+          Average pace
+        </h2>
+        <PaceChart months={paces} />
       </section>
     </>
   )
