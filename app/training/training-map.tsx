@@ -17,10 +17,9 @@ const PLACES: { name: string; bounds: Bounds }[] = [
   { name: 'Christchurch', bounds: [[172.53, -43.6], [172.73, -43.46]] },
   { name: 'Tulsa', bounds: [[-96.0, 36.09], [-95.91, 36.215]] },
   { name: 'Philadelphia', bounds: [[-75.23, 39.97], [-75.12, 40.08]] },
-  { name: 'Mexico City', bounds: [[-99.21, 19.37], [-99.13, 19.445]] },
 ]
 
-// Every route drawn faintly on top of the others, so the roads run most often build up darkest
+// Every route drawn on one map
 export default function TrainingMap({ year }: { year: number | null }) {
   const container = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
@@ -64,7 +63,6 @@ export default function TrainingMap({ year }: { year: number | null }) {
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': colors.route,
-          'line-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0.3, 15, 0.55],
           'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1, 15, 2.5],
         },
       })
