@@ -2,6 +2,7 @@
 
   strava-activities.csv      activities.csv from the Strava account export
   sleevemap-activities.csv   Strava routes saved by SleeveMap (to July 2026)
+  strava-routes.json         later routes from the export's GPS files, by activity id
   coros-sport-records.txt    COROS activity list (from April 2025)
   coros-routes.json          GPS tracks from COROS FIT files, keyed by start time
 
@@ -76,13 +77,18 @@ def num(v):
 # Strava, from the account export. Its header repeats some names (Distance in km,
 # then in metres), so read columns by position.
 sleevemap = {r['strava_id']: r['route'] for r in csv.DictReader(open(DATA / 'sleevemap-activities.csv'))}
+export_routes = json.load(open(DATA / 'strava-routes.json'))
 rows = list(csv.reader(open(DATA / 'strava-activities.csv', encoding='utf-8-sig')))
 col = {name: i for i, name in reversed(list(enumerate(rows[0])))}  # first occurrence
 activities = []
 for r in rows[1:]:
     start = datetime.strptime(r[col['Activity Date']], '%b %d, %Y, %I:%M:%S %p').replace(tzinfo=timezone.utc)
     metres = num(r[17]) or (num(r[6]) or 0) * 1000
-    route = sleevemap.get(r[col['Activity ID']])
+    aid = r[col['Activity ID']]
+    if sleevemap.get(aid):
+        route = json.loads(sleevemap[aid])['coordinates']
+    else:
+        route = simplify(export_routes[aid]) if aid in export_routes else None
     activities.append({
         'start': int(start.timestamp()),
         'type': STRAVA_TYPES.get(r[col['Activity Type']], 'Other'),
@@ -90,7 +96,7 @@ for r in rows[1:]:
         'secs': int(num(r[16]) or num(r[5]) or 0),
         'climb': num(r[col['Elevation Gain']]),
         'hr': round(num(r[col['Average Heart Rate']])) if r[col['Average Heart Rate']] else None,
-        'route': json.loads(route)['coordinates'] if route else None,
+        'route': route,
     })
 strava_starts = sorted(a['start'] for a in activities)
 cutoff = strava_starts[-1]
