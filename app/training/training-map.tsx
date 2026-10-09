@@ -17,7 +17,7 @@ const PLACES: { name: string; bounds: Bounds }[] = [
   { name: 'Christchurch', bounds: [[172.53, -43.6], [172.73, -43.46]] },
   { name: 'Tulsa', bounds: [[-96.21, 36.0], [-95.85, 36.29]] },
   { name: 'Philadelphia', bounds: [[-75.23, 39.97], [-75.12, 40.08]] },
-  { name: 'Mexico City', bounds: [[-99.23, 19.34], [-98.85, 19.68]] },
+  { name: 'Mexico City', bounds: [[-99.21, 19.37], [-99.13, 19.445]] },
 ]
 
 // Every route drawn faintly on top of the others, so the roads run most often build up darkest
@@ -64,7 +64,7 @@ export default function TrainingMap({ year }: { year: number | null }) {
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: {
           'line-color': colors.route,
-          'line-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0.12, 15, 0.3],
+          'line-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0.3, 15, 0.55],
           'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1, 15, 2.5],
         },
       })
