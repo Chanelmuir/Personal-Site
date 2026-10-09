@@ -17,6 +17,9 @@ export default function Navbar() {
           <a href="/nrr" className="run-link hover:text-accent transition-colors">
             NRR
           </a>
+          <a href="/training" className="run-link hover:text-accent transition-colors">
+            Training
+          </a>
           <a
             href="https://github.com/chanelmuir"
             target="_blank"
