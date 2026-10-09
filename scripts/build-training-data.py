@@ -8,12 +8,9 @@ Strava stops when its API changed in July 2026, so COROS takes over from the las
 Strava activity. Before that, COROS only adds activities Strava never had
 (no match within 10 minutes), such as indoor runs.
 
-Points near frequent start spots (home) are cut from every route.
-
 Usage: python3 scripts/build-training-data.py <data dir>
 """
 import csv, json, math, re, sys
-from collections import Counter
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -21,7 +18,6 @@ from pathlib import Path
 DATA = Path(sys.argv[1])
 ROOT = Path(__file__).resolve().parent.parent
 NZ = ZoneInfo('Pacific/Auckland')
-PRIVACY_RADIUS_M = 400
 MATCH_WINDOW_S = 600
 
 COROS_TYPES = {
@@ -30,11 +26,6 @@ COROS_TYPES = {
 }
 STRAVA_TYPES = {'Run': 'Run', 'TrailRun': 'Run', 'VirtualRun': 'Run', 'Walk': 'Walk', 'Hike': 'Hike',
                 'Ride': 'Ride', 'MountainBikeRide': 'Ride', 'GravelRide': 'Ride'}
-
-
-def metres(a, b):
-    lat = math.radians((a[1] + b[1]) / 2)
-    return math.hypot((a[0] - b[0]) * math.cos(lat), a[1] - b[1]) * 111_320
 
 
 def encode(coords):
@@ -115,35 +106,11 @@ for sport, body in re.findall(r'\d+\. (.+?) — \d{4}-\d\d-\d\d\n(.*?)(?=\n\n\d+
 
 activities.sort(key=lambda a: a['start'])
 
-# Privacy: find spots where lots of activities start or finish, and cut routes near them
-ends = Counter()
-for a in activities:
-    if a['route']:
-        for p in (a['route'][0], a['route'][-1]):
-            ends[(round(p[0], 3), round(p[1], 3))] += 1
-hot = [p for p, n in ends.items() if n >= 60]
-zones = []
-for p in sorted(hot, key=lambda p: -ends[p]):
-    if all(metres(p, z) > PRIVACY_RADIUS_M for z in zones):
-        zones.append(p)
-
 features = []
 for a in activities:
-    if not a['route']:
-        continue
-    pieces, cur = [], []
-    for p in a['route']:
-        if any(metres(p, z) < PRIVACY_RADIUS_M for z in zones):
-            if len(cur) > 1:
-                pieces.append(cur)
-            cur = []
-        else:
-            cur.append(p)
-    if len(cur) > 1:
-        pieces.append(cur)
-    year = datetime.fromtimestamp(a['start'], NZ).year
-    for piece in pieces:
-        features.append([year, a['type'], encode(piece)])
+    if a['route']:
+        year = datetime.fromtimestamp(a['start'], NZ).year
+        features.append([year, a['type'], encode(a['route'])])
 
 summary = [
     [datetime.fromtimestamp(a['start'], NZ).strftime('%Y-%m-%d'), a['type'], round(a['km'], 2),
@@ -155,4 +122,4 @@ summary = [
 json.dump(features, open(ROOT / 'public' / 'training' / 'routes.json', 'w'), separators=(',', ':'))
 json.dump(summary, open(ROOT / 'app' / 'training' / 'activities.json', 'w'), separators=(',', ':'))
 print(f'{len(activities)} activities, {sum(a["km"] for a in activities):.0f} km, '
-      f'{len(features)} route pieces, {len(zones)} privacy zones, cutoff {datetime.fromtimestamp(cutoff, timezone.utc)}')
+      f'{len(features)} routes, cutoff {datetime.fromtimestamp(cutoff, timezone.utc)}')

@@ -8,7 +8,7 @@ import { decodePolyline } from '../lib/polyline'
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
 // [year, type, encoded polyline], built by scripts/build-training-data.py
-type RoutePiece = [number, string, string]
+type RouteLine = [number, string, string]
 
 // Central Christchurch out to the Port Hills, where most of the runs are
 const CHRISTCHURCH: [[number, number], [number, number]] = [
@@ -39,15 +39,15 @@ export default function TrainingMap({ year }: { year: number | null }) {
 
     let cancelled = false
     instance.on('load', async () => {
-      const pieces: RoutePiece[] = await fetch('/training/routes.json').then((r) => r.json())
+      const lines: RouteLine[] = await fetch('/training/routes.json').then((r) => r.json())
       if (cancelled) return
       instance.addSource('routes', {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
-          features: pieces.map(([pieceYear, type, encoded]) => ({
+          features: lines.map(([lineYear, type, encoded]) => ({
             type: 'Feature',
-            properties: { year: pieceYear, type },
+            properties: { year: lineYear, type },
             geometry: { type: 'LineString', coordinates: decodePolyline(encoded) },
           })),
         },

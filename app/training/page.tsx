@@ -69,8 +69,7 @@ export default function TrainingPage() {
         <Link href="/projects/sleevemap" className="run-link text-text-primary hover:text-accent">
           SleeveMap
         </Link>
-        , and everything since from COROS. Indoor sessions count towards the totals but have no route. Routes are
-        cut short near the places I start from most. Updated {new Date(last).toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' })}.
+        , and everything since from COROS. Indoor sessions count towards the totals but have no route. Updated {new Date(last).toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' })}.
       </p>
     </div>
   )
