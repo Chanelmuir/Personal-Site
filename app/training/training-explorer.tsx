@@ -5,19 +5,20 @@ import TrainingMap from './training-map'
 import WeeklyChart from './weekly-chart'
 import RunCalendar from './run-calendar'
 import PaceChart from './pace-chart'
-import type { MonthPace, Week } from './stats'
+import YearToDateChart from './year-to-date-chart'
+import type { MonthPace, Week, YearToDate } from './stats'
 
 export type YearTotal = { year: number; km: number; runs: number; partial?: string }
 
 const fmt = new Intl.NumberFormat('en-NZ')
 
 // The year buttons and the distance chart both pick which year the map shows
-type Props = { years: YearTotal[]; weeks: Week[]; days: Record<string, number>; paces: MonthPace[] }
+type Props = { years: YearTotal[]; weeks: Week[]; days: Record<string, number>; paces: MonthPace[]; ytd: YearToDate[] }
 
 const section = 'mx-auto w-full max-w-6xl px-6 pt-16 sm:px-16'
 const heading = 'font-serif text-2xl text-text-primary'
 
-export default function TrainingExplorer({ years, weeks, days, paces }: Props) {
+export default function TrainingExplorer({ years, weeks, days, paces, ytd }: Props) {
   const [year, setYear] = useState<number | null>(null)
   const max = Math.max(...years.map((y) => y.km))
 
@@ -89,6 +90,13 @@ export default function TrainingExplorer({ years, weeks, days, paces }: Props) {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className={section} aria-labelledby="ytd">
+        <h2 id="ytd" className={heading}>
+          Year to date
+        </h2>
+        <YearToDateChart years={ytd} selected={year} />
       </section>
 
       <section className={section} aria-labelledby="by-week">

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import activities from './activities.json'
 import TrainingExplorer, { type YearTotal } from './training-explorer'
-import { dailyTotals, monthlyPace, weeklyTotals, type Run } from './stats'
+import { dailyTotals, monthlyPace, weeklyTotals, yearToDate, type Run } from './stats'
 
 export const metadata: Metadata = {
   title: 'Every run since 2018 | Chanel Muir',
@@ -63,6 +63,7 @@ export default function TrainingPage() {
         weeks={weeklyTotals(runList)}
         days={dailyTotals(runList)}
         paces={monthlyPace(runList)}
+        ytd={yearToDate(runList)}
       />
     </div>
   )

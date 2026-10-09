@@ -74,3 +74,28 @@ export function formatPace(secsPerKm: number) {
   const whole = Math.round(secsPerKm)
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')} /km`
 }
+
+export type YearToDate = { year: number; km: number[] }
+
+// Running total for each day of each year (index 0 is 1 January). The latest year stops at its
+// last run. Years that started partway through (the first one) are left out.
+export function yearToDate(runs: Run[]): YearToDate[] {
+  const days = dailyTotals(runs)
+  const firstYear = Number(runs[0].date.slice(0, 4))
+  const last = runs[runs.length - 1].date
+  const lastYear = Number(last.slice(0, 4))
+  const startsOnTime = runs[0].date.slice(5) <= '01-15'
+  const years: YearToDate[] = []
+  for (let year = startsOnTime ? firstYear : firstYear + 1; year <= lastYear; year++) {
+    const km: number[] = []
+    let total = 0
+    for (let t = Date.UTC(year, 0, 1); t < Date.UTC(year + 1, 0, 1); t += DAY) {
+      const date = toDate(t)
+      if (date > last) break
+      total += days[date] ?? 0
+      km.push(total)
+    }
+    years.push({ year, km })
+  }
+  return years
+}
