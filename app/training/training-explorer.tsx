@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import TrainingMap from './training-map'
 
-export type YearTotal = { year: number; km: number; activities: number; partial?: string }
+export type YearTotal = { year: number; km: number; runs: number; partial?: string }
 
 const fmt = new Intl.NumberFormat('en-NZ')
 
@@ -41,7 +41,7 @@ export default function TrainingExplorer({ years }: { years: YearTotal[] }) {
 
       <section className="mx-auto w-full max-w-6xl px-6 pt-16 sm:px-16" aria-labelledby="by-year">
         <h2 id="by-year" className="font-serif text-2xl text-text-primary">
-          Distance by year
+          Running distance by year
         </h2>
         <div className="mt-8 flex h-56 items-end gap-1.5 border-b border-text-primary sm:gap-3">
           {years.map((y) => {
@@ -51,7 +51,7 @@ export default function TrainingExplorer({ years }: { years: YearTotal[] }) {
                 key={y.year}
                 type="button"
                 onClick={() => setYear(year === y.year ? null : y.year)}
-                aria-label={`${y.year}: ${fmt.format(Math.round(y.km))} km over ${y.activities} activities${y.partial ? ` (${y.partial})` : ''}`}
+                aria-label={`${y.year}: ${fmt.format(Math.round(y.km))} km over ${y.runs} runs${y.partial ? ` (${y.partial})` : ''}`}
                 className="group relative flex h-full min-w-0 flex-1 items-end focus-visible:outline-none"
               >
                 <span
@@ -63,7 +63,7 @@ export default function TrainingExplorer({ years }: { years: YearTotal[] }) {
                 <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap border border-text-primary bg-background px-2.5 py-1.5 text-left text-xs text-text-primary group-hover:block group-focus-visible:block">
                   <span className="block font-semibold tabular-nums">{fmt.format(Math.round(y.km))} km</span>
                   <span className="block text-text-secondary tabular-nums">
-                    {y.activities} activities{y.partial ? `, ${y.partial}` : ''}
+                    {y.runs} runs{y.partial ? `, ${y.partial}` : ''}
                   </span>
                 </span>
               </button>
