@@ -4,7 +4,7 @@ import TrainingExplorer, { type YearTotal } from './training-explorer'
 import { dailyTotals, monthlyPace, weeklyTotals, yearToDate, type Run } from './stats'
 
 export const metadata: Metadata = {
-  title: 'Every run since 2018 | Chanel Muir',
+  title: 'My running stats | Chanel Muir',
 }
 
 // [date, type, km, moving seconds, climb m, avg HR], built by scripts/build-training-data.py
@@ -43,7 +43,7 @@ export default function TrainingPage() {
     <div className="overflow-x-hidden pb-24">
       <header className="mx-auto w-full max-w-6xl px-6 pt-10 pb-8 sm:px-16">
         <h1 className="text-[clamp(34px,5vw,56px)] font-extrabold leading-[0.95] tracking-[-0.03em] text-text-primary [font-stretch:125%]">
-          Every run since 2018
+          My running stats
         </h1>
         <dl className="mt-6 grid gap-6 sm:grid-cols-3">
           {stats.map((s) => (
