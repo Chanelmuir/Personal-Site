@@ -121,5 +121,7 @@ summary = [
 (ROOT / 'public' / 'training').mkdir(parents=True, exist_ok=True)
 json.dump(features, open(ROOT / 'public' / 'training' / 'routes.json', 'w'), separators=(',', ':'))
 json.dump(summary, open(ROOT / 'app' / 'training' / 'activities.json', 'w'), separators=(',', ':'))
+json.dump({'syncedAt': datetime.now(timezone.utc).isoformat(timespec='seconds')},
+          open(ROOT / 'app' / 'training' / 'synced.json', 'w'))
 print(f'{len(activities)} activities, {sum(a["km"] for a in activities):.0f} km, '
       f'{len(features)} routes, cutoff {datetime.fromtimestamp(cutoff, timezone.utc)}')

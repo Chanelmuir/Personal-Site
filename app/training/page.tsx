@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import activities from './activities.json'
+import synced from './synced.json'
 import TrainingExplorer, { type YearTotal } from './training-explorer'
 import { dailyTotals, monthlyPace, weeklyTotals, yearToDate, type Run } from './stats'
 
@@ -12,6 +13,15 @@ type Activity = [string, string, number, number, number | null, number | null]
 
 const EARTH_KM = 40075
 const fmt = new Intl.NumberFormat('en-NZ')
+const syncedFmt = new Intl.DateTimeFormat('en-NZ', {
+  timeZone: 'Pacific/Auckland',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZoneName: 'short',
+})
 
 export default function TrainingPage() {
   const all = activities as Activity[]
@@ -45,6 +55,9 @@ export default function TrainingPage() {
         <h1 className="text-[clamp(34px,5vw,56px)] font-extrabold leading-[0.95] tracking-[-0.03em] text-text-primary [font-stretch:125%]">
           My running stats
         </h1>
+        <p className="mt-3 text-sm text-text-secondary">
+          Last synced <time dateTime={synced.syncedAt}>{syncedFmt.format(new Date(synced.syncedAt))}</time>
+        </p>
         <dl className="mt-6 grid gap-6 sm:grid-cols-3">
           {stats.map((s) => (
             <div key={s.label} className="border-t-[1.5px] border-text-primary pt-3">
