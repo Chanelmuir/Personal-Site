@@ -7,9 +7,9 @@
   coros-routes.json          GPS tracks from COROS FIT files, keyed by start time
 
 The Strava export is the activity list, treadmill and manual runs included.
-Routes come from SleeveMap, or from COROS for later activities. COROS also adds
-anything Strava doesn't have (no match within 10 minutes), such as runs after
-the export.
+Routes come from SleeveMap, the export's GPS files, or COROS. COROS adds the
+activities after the export; earlier COROS activities missing from Strava were
+deleted or replaced there, so they're left out.
 
 Usage: python3 scripts/build-training-data.py <data dir>
 """
@@ -120,6 +120,8 @@ for sport, body in re.findall(r'\d+\. (.+?) — \d{4}-\d\d-\d\d\n(.*?)(?=\n\n\d+
         match['route'] = match['route'] or route
         match['at'] = at
         continue
+    if start <= cutoff:
+        continue  # not on Strava, so Chanel deleted or replaced it there
     dist = re.search(r'Distance: ([\d.]+) (km|m)\b', body)
     dur = re.search(r'Duration: ([\d:]+)', body).group(1).split(':')
     hr = re.search(r'Avg HR: (\d+)', body)
