@@ -1,12 +1,14 @@
 """Builds the /training page data from two exports that stay outside the repo.
 
-  sleevemap-activities.csv   Strava history saved by SleeveMap (to July 2026)
+  strava-activities.csv      activities.csv from the Strava account export
+  sleevemap-activities.csv   Strava routes saved by SleeveMap (to July 2026)
   coros-sport-records.txt    COROS activity list (from April 2025)
   coros-routes.json          GPS tracks from COROS FIT files, keyed by start time
 
-Strava stops when its API changed in July 2026, so COROS takes over from the last
-Strava activity. Before that, COROS only adds activities Strava never had
-(no match within 10 minutes), such as indoor runs.
+The Strava export is the activity list, treadmill and manual runs included.
+Routes come from SleeveMap, or from COROS for later activities. COROS also adds
+anything Strava doesn't have (no match within 10 minutes), such as runs after
+the export.
 
 Usage: python3 scripts/build-training-data.py <data dir>
 """
@@ -27,7 +29,7 @@ COROS_TYPES = {
     'Walk': 'Walk', 'Hike': 'Hike', 'Cycling': 'Ride',
 }
 STRAVA_TYPES = {'Run': 'Run', 'TrailRun': 'Run', 'VirtualRun': 'Run', 'Walk': 'Walk', 'Hike': 'Hike',
-                'Ride': 'Ride', 'MountainBikeRide': 'Ride', 'GravelRide': 'Ride'}
+                'Ride': 'Ride', 'Velomobile': 'Ride', 'MountainBikeRide': 'Ride', 'GravelRide': 'Ride'}
 
 
 def encode(coords):
@@ -67,36 +69,54 @@ def simplify(coords, tol=0.0001):
     return [c for c, k in zip(coords, keep) if k]
 
 
-activities = []
+def num(v):
+    return float(v) if v else None
 
-# Strava, via SleeveMap
-for r in csv.DictReader(open(DATA / 'sleevemap-activities.csv')):
-    start = datetime.fromisoformat(r['start_date'].replace('+00', '+00:00'))
+
+# Strava, from the account export. Its header repeats some names (Distance in km,
+# then in metres), so read columns by position.
+sleevemap = {r['strava_id']: r['route'] for r in csv.DictReader(open(DATA / 'sleevemap-activities.csv'))}
+rows = list(csv.reader(open(DATA / 'strava-activities.csv', encoding='utf-8-sig')))
+col = {name: i for i, name in reversed(list(enumerate(rows[0])))}  # first occurrence
+activities = []
+for r in rows[1:]:
+    start = datetime.strptime(r[col['Activity Date']], '%b %d, %Y, %I:%M:%S %p').replace(tzinfo=timezone.utc)
+    metres = num(r[17]) or (num(r[6]) or 0) * 1000
+    route = sleevemap.get(r[col['Activity ID']])
     activities.append({
         'start': int(start.timestamp()),
-        'type': STRAVA_TYPES.get(r['type'], 'Other'),
-        'km': float(r['distance_m'] or 0) / 1000,
-        'secs': int(float(r['moving_time_s'] or 0)),
-        'climb': float(r['elevation_m'] or 0),
-        'route': json.loads(r['route'])['coordinates'] if r['route'] else None,
+        'type': STRAVA_TYPES.get(r[col['Activity Type']], 'Other'),
+        'km': metres / 1000,
+        'secs': int(num(r[16]) or num(r[5]) or 0),
+        'climb': num(r[col['Elevation Gain']]),
+        'hr': round(num(r[col['Average Heart Rate']])) if r[col['Average Heart Rate']] else None,
+        'route': json.loads(route)['coordinates'] if route else None,
     })
 strava_starts = sorted(a['start'] for a in activities)
 cutoff = strava_starts[-1]
 
-# COROS
+
+def strava_match(start):
+    return next((a for a in activities if abs(a['start'] - start) <= MATCH_WINDOW_S), None)
+
+
+# COROS fills in routes Strava's export lacks, and adds anything Strava never got
 text = json.load(open(DATA / 'coros-sport-records.txt'))
 routes = json.load(open(DATA / 'coros-routes.json'))
 for sport, body in re.findall(r'\d+\. (.+?) — \d{4}-\d\d-\d\d\n(.*?)(?=\n\n\d+\. |\Z)', text, re.S):
     start = int(re.search(r'startTimestamp=(\d+)', body).group(1))
-    if start <= cutoff + 60:
-        near = [s for s in strava_starts if abs(s - start) <= MATCH_WINDOW_S]
-        if near:
-            continue
+    at = re.search(r'Start Coordinates: (-?[\d.]+), (-?[\d.]+)', body)
+    at = (float(at.group(2)), float(at.group(1))) if at else None
+    route = routes.get(str(start))
+    route = simplify(route) if route and len(route) > 1 else None
+    match = strava_match(start)
+    if match:
+        match['route'] = match['route'] or route
+        match['at'] = at
+        continue
     dist = re.search(r'Distance: ([\d.]+) (km|m)\b', body)
     dur = re.search(r'Duration: ([\d:]+)', body).group(1).split(':')
     hr = re.search(r'Avg HR: (\d+)', body)
-    at = re.search(r'Start Coordinates: (-?[\d.]+), (-?[\d.]+)', body)
-    route = routes.get(str(start))
     activities.append({
         'start': start,
         'type': COROS_TYPES.get(sport, 'Other'),
@@ -104,8 +124,8 @@ for sport, body in re.findall(r'\d+\. (.+?) — \d{4}-\d\d-\d\d\n(.*?)(?=\n\n\d+
         'secs': sum(int(x) * 60 ** i for i, x in enumerate(reversed(dur))),
         'climb': None,
         'hr': int(hr.group(1)) if hr else None,
-        'route': simplify(route) if route and len(route) > 1 else None,
-        'at': (float(at.group(2)), float(at.group(1))) if at else None,
+        'route': route,
+        'at': at,
     })
 
 activities.sort(key=lambda a: a['start'])
