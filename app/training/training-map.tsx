@@ -15,7 +15,7 @@ type Bounds = [[number, number], [number, number]]
 // Where most of the routes are, as [west, south], [east, north]
 const PLACES: { name: string; bounds: Bounds }[] = [
   { name: 'Christchurch', bounds: [[172.53, -43.6], [172.73, -43.46]] },
-  { name: 'Tulsa', bounds: [[-96.21, 36.0], [-95.85, 36.29]] },
+  { name: 'Tulsa', bounds: [[-96.0, 36.09], [-95.91, 36.215]] },
   { name: 'Philadelphia', bounds: [[-75.23, 39.97], [-75.12, 40.08]] },
   { name: 'Mexico City', bounds: [[-99.21, 19.37], [-99.13, 19.445]] },
 ]
