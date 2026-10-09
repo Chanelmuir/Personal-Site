@@ -15,6 +15,8 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from pathlib import Path
 
+from timezonefinder import TimezoneFinder
+
 DATA = Path(sys.argv[1])
 ROOT = Path(__file__).resolve().parent.parent
 NZ = ZoneInfo('Pacific/Auckland')
@@ -93,6 +95,7 @@ for sport, body in re.findall(r'\d+\. (.+?) — \d{4}-\d\d-\d\d\n(.*?)(?=\n\n\d+
     dist = re.search(r'Distance: ([\d.]+) (km|m)\b', body)
     dur = re.search(r'Duration: ([\d:]+)', body).group(1).split(':')
     hr = re.search(r'Avg HR: (\d+)', body)
+    at = re.search(r'Start Coordinates: (-?[\d.]+), (-?[\d.]+)', body)
     route = routes.get(str(start))
     activities.append({
         'start': start,
@@ -102,18 +105,29 @@ for sport, body in re.findall(r'\d+\. (.+?) — \d{4}-\d\d-\d\d\n(.*?)(?=\n\n\d+
         'climb': None,
         'hr': int(hr.group(1)) if hr else None,
         'route': simplify(route) if route and len(route) > 1 else None,
+        'at': (float(at.group(2)), float(at.group(1))) if at else None,
     })
 
 activities.sort(key=lambda a: a['start'])
 
+# Dates are in each activity's local time zone, looked up from where it started.
+# Activities with no location (treadmill, manual) take the zone of the one before.
+finder, tz = TimezoneFinder(), NZ
+for a in activities:
+    lng, lat = a['route'][0] if a['route'] else a.get('at') or (0, 0)
+    name = finder.timezone_at(lng=lng, lat=lat) if (lng, lat) != (0, 0) else None
+    if name and not name.startswith('Etc/'):
+        tz = ZoneInfo(name)
+    a['tz'] = tz
+
 features = []
 for a in activities:
     if a['route']:
-        year = datetime.fromtimestamp(a['start'], NZ).year
+        year = datetime.fromtimestamp(a['start'], a['tz']).year
         features.append([year, a['type'], encode(a['route'])])
 
 summary = [
-    [datetime.fromtimestamp(a['start'], NZ).strftime('%Y-%m-%d'), a['type'], round(a['km'], 2),
+    [datetime.fromtimestamp(a['start'], a['tz']).strftime('%Y-%m-%d'), a['type'], round(a['km'], 2),
      a['secs'], None if a['climb'] is None else round(a['climb']), a.get('hr')]
     for a in activities
 ]
