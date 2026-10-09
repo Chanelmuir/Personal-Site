@@ -1,16 +1,18 @@
+import Link from "next/link";
+
 export default function Navbar() {
   return (
     <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-sm">
-      <div className="flex justify-between items-center gap-4 px-6 py-5 sm:px-16 max-w-6xl mx-auto w-full">
+      <div className="flex justify-between items-center gap-3 px-6 py-5 sm:gap-4 sm:px-16 max-w-6xl mx-auto w-full">
         {/* Left (Main Page) */}
         <a
           href="/"
-          className="font-serif text-lg text-text-primary hover:text-accent transition-colors"
+          className="font-serif text-base text-text-primary sm:text-lg hover:text-accent transition-colors"
         >
-          chanelmuir.com
+          chanelmuir<span className="hidden min-[420px]:inline">.com</span>
         </a>
         {/* Right (Navigation Links) */}
-        <div className="flex items-center gap-6 text-sm text-text-secondary">
+        <div className="flex items-center gap-2.5 text-[13px] min-[375px]:gap-3 text-text-secondary sm:gap-6 sm:text-sm">
           <a href="/gallery" className="run-link hover:text-accent transition-colors">
             Gallery
           </a>
@@ -20,6 +22,9 @@ export default function Navbar() {
           <a href="/training" className="run-link hover:text-accent transition-colors">
             Training
           </a>
+          <Link href="/dsa" className="run-link hover:text-accent transition-colors">
+            DSA
+          </Link>
           <a
             href="https://github.com/chanelmuir"
             target="_blank"
