@@ -1,7 +1,7 @@
 ---
 name: "Selective Site Blocker"
 tagline: "A Chrome extension that blocks a site but lets the useful pages through, like keeping Instagram messages while losing the feed."
-image: "/specific_site_blocker_cropped.png"
+image: "/selective_site_blocker_popup.png"
 repo: "https://github.com/Chanelmuir/Selective-Site-Blocker"
 tags: ["Chrome extension", "JavaScript", "HTML", "CSS"]
 order: 2
