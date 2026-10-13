@@ -6,6 +6,7 @@ const pages = [
   { href: "/gallery", label: "Gallery" },
   { href: "/nrr", label: "NRR" },
   { href: "/training", label: "Training" },
+  { href: "/dsa", label: "DSA" },
 ];
 
 export default function Navbar() {
