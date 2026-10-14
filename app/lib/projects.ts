@@ -12,6 +12,7 @@ export interface ProjectMeta {
   tagline: string
   image: string
   href?: string
+  links?: { label: string; href: string }[]
   repo?: string
   post?: string
   tags: string[]
@@ -26,6 +27,7 @@ function toMeta(slug: string, data: Record<string, unknown>): ProjectMeta {
     tagline: (data.tagline as string) ?? '',
     image: (data.image as string) ?? '',
     href: data.href as string | undefined,
+    links: data.links as { label: string; href: string }[] | undefined,
     repo: data.repo as string | undefined,
     post: data.post as string | undefined,
     tags: (data.tags as string[]) ?? [],

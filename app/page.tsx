@@ -3,7 +3,7 @@ import { getAllProjectsMeta, type ProjectMeta } from './lib/projects'
 import StreetMapHero from './components/street-map-hero'
 
 function ProjectLinks({ project }: { project: ProjectMeta }) {
-  if (!project.href && !project.repo) return null
+  if (!project.href && !project.links && !project.repo) return null
   return (
     <div className="flex flex-wrap gap-x-5 gap-y-1 text-[15px] font-semibold text-accent">
       {project.href && (
@@ -14,6 +14,11 @@ function ProjectLinks({ project }: { project: ProjectMeta }) {
           Open {project.name}
         </a>
       )}
+      {project.links?.map((link) => (
+        <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="run-link [--rest-line:color-mix(in_srgb,currentColor_35%,transparent)] hover:text-text-primary">
+          {link.label}
+        </a>
+      ))}
       {project.repo && (
         <a href={project.repo} target="_blank" rel="noopener noreferrer" className="run-link [--rest-line:color-mix(in_srgb,currentColor_35%,transparent)] hover:text-text-primary">
           Source
