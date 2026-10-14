@@ -4,7 +4,7 @@ tagline: "A Chrome extension that blocks a site but lets the useful pages throug
 image: "/selective_site_blocker_popup.png"
 repo: "https://github.com/Chanelmuir/Selective-Site-Blocker"
 tags: ["Chrome extension", "JavaScript", "HTML", "CSS"]
-order: 2
+order: 3
 ---
 
 Most site blockers are all or nothing. I wanted to cut out social media feeds without losing the messaging that I actually use them for, and nothing I found could do that.

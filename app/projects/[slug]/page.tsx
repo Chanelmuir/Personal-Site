@@ -47,6 +47,11 @@ export default async function ProjectPage({
             Try it <i className="fa-solid fa-arrow-up-right-from-square text-xs" />
           </a>
         )}
+        {project.links?.map((link) => (
+          <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-accent hover:opacity-80">
+            {link.label} <i className="fa-solid fa-arrow-up-right-from-square text-xs" />
+          </a>
+        ))}
         {project.repo && (
           <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-accent">
             <i className="fa-brands fa-github" /> Source
