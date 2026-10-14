@@ -1,6 +1,6 @@
 ---
 name: "Concrete & Landscape Brothers"
-tagline: "Two new websites for a pair of sister trades businesses in Christchurch, from first design sketch to live launch."
+tagline: "Two new websites for a pair of brother companies in Christchurch, one for concreting and one for landscaping, from first design sketch to live launch."
 image: "/concrete_landscape_brothers.jpg"
 links:
   - label: "Concrete Brothers"
@@ -11,7 +11,7 @@ tags: ["Next.js", "TypeScript", "Tailwind", "Sanity", "Vercel"]
 order: 2
 ---
 
-Concrete Brothers and Landscape Brothers are two Christchurch trades businesses with the same founders and a shared showroom. Their old WordPress sites were slow and hard to change, so I designed and built new ones for both, then took them through to launch.
+Concrete Brothers and Landscape Brothers are brother companies in Christchurch, two sides of the same business with a shared showroom. Their old WordPress sites were looking a little outdated, so I designed and built new ones for both, then took them through to launch.
 
 ## Designing two sites as one family
 
@@ -27,10 +27,5 @@ Every change got its own Vercel preview link, which made client review easy.
 
 ## The invisible parts
 
-The visible site turned out to be the easy part. Enquiries are the business, and I found that the old sites quietly sent every form through an agency's Zapier setup into spreadsheets and email alerts. I rebuilt the forms to feed that same setup so nothing changed for the team, with a direct email fallback in case it's ever unreachable. I also carried over the Google and Meta conversion tracking, mapped nearly 300 old URLs to their new homes so search rankings carried over, and spent a fair bit of time on speed and accessibility, especially on phones.
+The visible site turned out to be the easy part. Enquiries are the business, and I found that the old sites quietly sent every form through an agency's Zapier setup into spreadsheets and email alerts. I rebuilt the forms to feed that same setup so nothing changed for the team, with a direct email fallback in case it's ever unreachable. I also optimised both sites for search, including mapping nearly 300 old URLs to their new homes so rankings carried over, set up conversion tracking with their marketing agency, and spent a fair bit of time on speed and accessibility, especially on phones.
 
-## Launch
-
-I wrote a step-by-step run-sheet for the switch, with a rollback plan, and moved both domains over in one daytime session with no downtime. When the agency found a last-minute issue on their side, I held the launch a day until they'd signed off.
-
-The biggest thing I took away: a migration is mostly about the plumbing nobody wrote down, and the way to get it right is to measure and check rather than assume.
