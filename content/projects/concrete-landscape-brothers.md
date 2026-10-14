@@ -21,7 +21,7 @@ From there I built out the home pages, service pages, a project gallery with cas
 
 ## The build
 
-Both sites are Next.js, rendered on the server so they load fast and search engines see everything. The pieces are shared between them: hero sections, service sections, a finish comparator for choosing concrete finishes, the gallery and a consultation booking dialog. The owners edit their own content in Sanity, and a change shows up on the live site moments after they publish.
+Both sites are Next.js, rendered on the server so they load fast and search engines see everything. The pieces are shared between them: hero sections, service sections, a finish comparator for choosing concrete finishes, the gallery and a consultation booking dialog. The owners can edit their own content in Sanity, and any change shows up on the live site moments after they publish.
 
 ## The invisible parts
 
