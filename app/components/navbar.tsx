@@ -55,7 +55,7 @@ export default function Navbar() {
           >
             <i className="fa-brands fa-github"></i>
           </a>
-          <a href="mailto:chanelkmuir@gmail.com" aria-label="Email" className="hover:text-accent transition-colors">
+          <a href="mailto:mail@chanelmuir.com" aria-label="Email" className="hover:text-accent transition-colors">
             <i className="fa-solid fa-envelope"></i>
           </a>
           {/* Phones: pages go in a dropdown on the right */}
