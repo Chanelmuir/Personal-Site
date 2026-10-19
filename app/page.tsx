@@ -28,6 +28,14 @@ function ProjectLinks({ project }: { project: ProjectMeta }) {
   )
 }
 
+function WipLabel() {
+  return (
+    <span className="ml-2.5 inline-block translate-y-[-0.2em] rounded-full border border-border px-2 py-0.5 align-middle font-sans text-xs font-medium tracking-normal text-text-secondary [font-stretch:100%]">
+      Work in progress
+    </span>
+  )
+}
+
 function Screenshot({ project, wide }: { project: ProjectMeta; wide?: boolean }) {
   return (
     <a
@@ -63,6 +71,7 @@ export default function Home() {
             <div className="flex min-w-0 flex-col gap-3">
               <h3 className="text-[clamp(30px,4vw,44px)] font-bold leading-none tracking-[-0.02em] text-text-primary [font-stretch:125%]">
                 <a href={`/projects/${lead.slug}`} className="hover:text-accent">{lead.name}</a>
+                {lead.wip && <WipLabel />}
               </h3>
               <p className="max-w-[46ch] text-lg leading-relaxed text-text-primary">{lead.tagline}</p>
               <ProjectLinks project={lead} />
@@ -76,6 +85,7 @@ export default function Home() {
               <Screenshot project={project} />
               <h3 className="mt-1.5 font-serif text-[22px] text-text-primary">
                 <a href={`/projects/${project.slug}`} className="hover:text-accent">{project.name}</a>
+                {project.wip && <WipLabel />}
               </h3>
               <p className="leading-relaxed text-text-secondary">{project.tagline}</p>
               <ProjectLinks project={project} />

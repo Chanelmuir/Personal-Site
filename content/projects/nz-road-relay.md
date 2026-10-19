@@ -4,7 +4,7 @@ tagline: "A quick visualisation of the 2026 NZ Road Relay results: course maps, 
 image: "/nrr.png"
 href: "/nrr"
 tags: ["Next.js", "Mapbox", "Data visualisation"]
-order: 5
+order: 6
 ---
 
 A quick visualisation of the 2026 NZ Road Relay data. The results were crawled using Claude, then turned into a course map, leg splits and team position charts.
