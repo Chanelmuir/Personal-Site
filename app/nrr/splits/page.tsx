@@ -5,6 +5,7 @@ import { race } from './data'
 export const metadata: Metadata = {
   title: 'Road relay splits · Chanel Muir',
   description: 'Every leg split from the 2026 NZ Road Relay Champs, ranked fastest to slowest.',
+  alternates: { canonical: '/nrr/splits' },
 }
 
 export default function SplitsPage() {

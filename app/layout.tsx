@@ -3,6 +3,7 @@ import { Archivo, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/dist/client/script";
 import Navbar from "./components/navbar";
+import { siteUrl } from "./lib/site";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -16,8 +17,9 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Chanel Muir",
-  description: "Personal Website",
+  description: "Chanel Muir's site for hosting hobby projects: SleeveMap, running stats, NZ Road Relay splits and more.",
   icons: {
     icon: "/favicon.ico", 
   },

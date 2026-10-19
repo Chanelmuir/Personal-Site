@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { getAllProjectsMeta, type ProjectMeta } from './lib/projects'
 import StreetMapHero from './components/street-map-hero'
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+}
 
 function ProjectLinks({ project }: { project: ProjectMeta }) {
   if (!project.href && !project.links && !project.repo) return null
