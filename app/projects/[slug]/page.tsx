@@ -35,7 +35,15 @@ export default async function ProjectPage({
         ← Back
       </Link>
 
-      <h1 className="mt-6 font-serif text-4xl tracking-tight text-text-primary sm:text-5xl">
+      {project.wip && (
+        <div className="mt-6">
+          <span className="inline-block rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-text-secondary">
+            Work in progress
+          </span>
+        </div>
+      )}
+
+      <h1 className={`${project.wip ? 'mt-3' : 'mt-6'} font-serif text-4xl tracking-tight text-text-primary sm:text-5xl`}>
         {project.name}
       </h1>
 

@@ -16,6 +16,7 @@ export interface ProjectMeta {
   repo?: string
   post?: string
   tags: string[]
+  wip: boolean
   order: number
 }
 
@@ -31,6 +32,7 @@ function toMeta(slug: string, data: Record<string, unknown>): ProjectMeta {
     repo: data.repo as string | undefined,
     post: data.post as string | undefined,
     tags: (data.tags as string[]) ?? [],
+    wip: data.wip === true,
     order: (data.order as number) ?? 0,
   }
 }
