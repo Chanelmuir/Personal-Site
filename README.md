@@ -4,8 +4,6 @@ My personal site, and a home for the things I build for fun. Most of them end up
 
 [![The homepage: a street map of central Christchurch with a GPS-art run spelling "Chanel Muir"](docs/homepage.jpg)](https://chanelmuir.com)
 
-The run on the homepage is real. It's a 13.6 km run through central Christchurch, drawn exactly as my watch recorded it.
-
 ## What's on it
 
 - **[Projects](https://chanelmuir.com)**: a page for each thing I've made, like [SleeveMap](https://sleevemap.chanelmuir.com/) (every street I've ever run, on one map) and a Chrome extension that blocks a site but keeps the useful pages open.
