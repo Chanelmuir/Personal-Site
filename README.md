@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# chanelmuir.com
 
-## Getting Started
+My personal site, and a home for the things I build for fun. Most of them end up involving running and maps.
 
-First, run the development server:
+[![The homepage: a street map of central Christchurch with a GPS-art run spelling "Chanel Muir"](docs/homepage.jpg)](https://chanelmuir.com)
+
+The run on the homepage is real. It's a 13.6 km run through central Christchurch, drawn exactly as my watch recorded it.
+
+## What's on it
+
+- **[Projects](https://chanelmuir.com)**: a page for each thing I've made, like [SleeveMap](https://sleevemap.chanelmuir.com/) (every street I've ever run, on one map) and a Chrome extension that blocks a site but keeps the useful pages open.
+- **[Training](https://chanelmuir.com/training)**: every run since about 2018. Every route is drawn on one map, with charts for distance, pace and the year so far. A daily job pulls new runs from my watch and keeps it up to date.
+- **[NRR](https://chanelmuir.com/nrr)**: the 2026 NZ Road Relay, with course maps, leg splits and how each team's position changed over the day.
+- **[Gallery](https://chanelmuir.com/gallery)**: a guessing game. You get one of my photos and drop a pin where you think it was taken.
+
+## Built with
+
+Next.js, Tailwind, Mapbox GL and Supabase, hosted on Vercel.
+
+## Running it locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [localhost:3000](http://localhost:3000). Pages that use a map or the gallery need these in `.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Used for |
+| --- | --- |
+| `NEXT_PUBLIC_MAPBOX_TOKEN` | All the maps |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Gallery photos |
+| `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_UPLOAD_PASSWORD` | Uploading gallery photos at `/admin/gallery-upload` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Where things live
 
-## Learn More
+```
+app/                 pages (one folder per route: training, nrr, gallery, projects, ...)
+content/projects/    the write-up for each project, in Markdown
+content/posts/       longer posts
+scripts/             build-training-data.py, which turns Strava and COROS exports into the /training data
+public/              images
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Adding a project is a new Markdown file in `content/projects/`. It gets its own page and a card on the homepage.
