@@ -30,7 +30,7 @@ function ProjectLinks({ project }: { project: ProjectMeta }) {
 
 function WipLabel() {
   return (
-    <span className="ml-2.5 inline-block translate-y-[-0.2em] rounded-full border border-border px-2 py-0.5 align-middle font-sans text-xs font-medium tracking-normal text-text-secondary [font-stretch:100%]">
+    <span className="rounded-full border border-border px-2 py-0.5 align-middle font-sans text-xs font-medium tracking-normal text-text-secondary [font-stretch:100%]">
       Work in progress
     </span>
   )
@@ -69,7 +69,7 @@ export default function Home() {
           <article className="mt-9 grid items-end gap-5 md:grid-cols-[1.55fr_1fr] md:gap-9">
             <Screenshot project={lead} wide />
             <div className="flex min-w-0 flex-col gap-3">
-              <h3 className="text-[clamp(30px,4vw,44px)] font-bold leading-none tracking-[-0.02em] text-text-primary [font-stretch:125%]">
+              <h3 className="flex flex-wrap items-center gap-x-2.5 gap-y-2 text-[clamp(30px,4vw,44px)] font-bold leading-none tracking-[-0.02em] text-text-primary [font-stretch:125%]">
                 <a href={`/projects/${lead.slug}`} className="hover:text-accent">{lead.name}</a>
                 {lead.wip && <WipLabel />}
               </h3>
@@ -83,7 +83,7 @@ export default function Home() {
           {rest.map((project) => (
             <article key={project.slug} className="flex min-w-0 flex-col gap-3">
               <Screenshot project={project} />
-              <h3 className="mt-1.5 font-serif text-[22px] text-text-primary">
+              <h3 className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 font-serif text-[22px] text-text-primary">
                 <a href={`/projects/${project.slug}`} className="hover:text-accent">{project.name}</a>
                 {project.wip && <WipLabel />}
               </h3>

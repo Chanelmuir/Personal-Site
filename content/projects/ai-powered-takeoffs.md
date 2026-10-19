@@ -1,7 +1,7 @@
 ---
-name: "Plan Takeoff"
+name: "AI-Powered Takeoffs"
 tagline: "A tool that measures site and landscape plans and turns them into a draft quote, for the same Concrete Brothers and Landscape Brothers team."
-image: "/cb_lb_takeoff.jpg"
+image: "/ai_powered_takeoffs.jpg"
 tags: ["Python", "PyMuPDF", "PyTorch", "ONNX"]
 wip: true
 order: 3
