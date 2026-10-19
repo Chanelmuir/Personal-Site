@@ -6,6 +6,8 @@ import { dailyTotals, monthlyPace, weeklyTotals, yearToDate, type Run } from './
 
 export const metadata: Metadata = {
   title: 'My running stats | Chanel Muir',
+  description: "Every run I've done since about 2018, drawn on one map, with distance and pace charts.",
+  alternates: { canonical: '/training' },
 }
 
 // [date, type, km, moving seconds, climb m, avg HR], built by scripts/build-training-data.py
