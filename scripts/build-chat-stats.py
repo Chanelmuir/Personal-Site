@@ -1,9 +1,9 @@
-"""Build app/chav/stats.json from an Instagram group chat export.
+"""Build app/<page>/stats.json from an Instagram group chat export.
 
-Usage: python3 scripts/build-chat-stats.py <export folder with message_*.json>
+Usage: python3 scripts/build-chat-stats.py <export folder with message_*.json> <page, e.g. chav>
 
 Mostly counts. The only message text and media kept are the 10 most reacted messages
-and 6 most reacted photos/videos (copied to public/chav).
+and 6 most reacted photos/videos (copied to public/<page>).
 """
 import collections
 import datetime
@@ -39,7 +39,7 @@ def norm(e):
     e = e.replace('\uFE0F', '')
     return '❤\uFE0F' if e == '❤' else e  # bare ❤ shows black on some phones
 
-folder = sys.argv[1]
+folder, page = sys.argv[1], sys.argv[2]  # e.g. ~/chav_123 chav
 msgs = []
 for f in sorted(glob.glob(f'{folder}/message_*.json')):
     msgs += json.load(open(f, encoding='utf-8'))['messages']
@@ -53,6 +53,8 @@ for m in msgs:
         r['reaction'] = norm(fix(r['reaction']))
         r['actor'] = fix(r['actor'])
 
+# Meta AI isn't a member, so its replies don't count
+msgs = [m for m in msgs if m['sender_name'] != 'Meta AI']
 real = [m for m in msgs if not (m['content'] and NOTICE.search(m['content'])) and not m.get('is_unsent')]
 
 # First names only, plus a last initial where two people share one
@@ -81,7 +83,9 @@ for m in msgs:
         given[name(r['actor'])] += 1
         reactions[r['reaction']] += 1
 
-emojis = collections.Counter(norm(e) for m in real for e in EMOJI.findall(m['content']))
+# Coloured squares are Wordle results, not emoji anyone chose
+SQUARES = set('🟩🟨⬛⬜🟥🟦🟧🟪🟫')
+emojis = collections.Counter(norm(e) for m in real for e in EMOJI.findall(m['content']) if norm(e) not in SQUARES)
 months = collections.Counter(m['when'].strftime('%Y-%m') for m in real)
 days = collections.Counter(m['when'].date().isoformat() for m in real)
 grid = [[0] * 24 for _ in range(7)]  # Monday first
@@ -110,27 +114,29 @@ media = sum(len(m.get('photos', [])) + len(m.get('videos', [])) + len(m.get('aud
 SKIP_MEDIA = {'2518273348677057.jpg', '704128799273984.jpg', '3275627849234908.jpg'}
 files = {f.rsplit('/', 1)[-1]: f for f in glob.glob(f'{folder}/**/*', recursive=True)}
 by_reactions = sorted(real, key=lambda m: -len(m.get('reactions', [])))
+# In a small chat nearly every message tops out at the same few reactions, so a ranking means nothing
+ranked = by_reactions if len(by_reactions[0].get('reactions', [])) >= 5 else []
 caption = lambda m: {'name': name(m['sender_name']), 'date': m['when'].date().isoformat(), 'reactions': len(m.get('reactions', []))}
 top_emojis = lambda m: [e for e, _ in collections.Counter(r['reaction'] for r in m.get('reactions', [])).most_common(3)]
-top_messages = [caption(m) | {'text': m['content'], 'emojis': top_emojis(m)} for m in by_reactions if m['content'] and not m.get('share')][:10]
+top_messages = [caption(m) | {'text': m['content'], 'emojis': top_emojis(m)} for m in ranked if m['content'] and not m.get('share')][:10]
 
-shutil.rmtree('public/chav', ignore_errors=True)
-os.makedirs('public/chav')
+shutil.rmtree(f'public/{page}', ignore_errors=True)
+os.makedirs(f'public/{page}')
 top_media = []
-for m in by_reactions:
+for m in ranked:
     for x in m.get('photos', []) + m.get('videos', []):
         file = x['uri'].rsplit('/', 1)[-1]
         if file in SKIP_MEDIA or file not in files or len(top_media) == 6:
             continue
         if file.endswith('.mp4'):
-            shutil.copy(files[file], f'public/chav/{file}')
+            shutil.copy(files[file], f'public/{page}/{file}')
         else:
             from PIL import Image
             img = Image.open(files[file]).convert('RGB')
             img.thumbnail((800, 800))
             file = file.rsplit('.', 1)[0] + '.jpg'
-            img.save(f'public/chav/{file}', quality=82)
-        top_media.append(caption(m) | {'src': f'/chav/{file}', 'video': file.endswith('.mp4')})
+            img.save(f'public/{page}/{file}', quality=82)
+        top_media.append(caption(m) | {'src': f'/{page}/{file}', 'video': file.endswith('.mp4')})
 
 # A conversation starts with the first message after 4 hours of quiet. A reply is a
 # message straight after someone else's, inside a conversation.
@@ -190,5 +196,5 @@ out = {
 
 assert out['messages'] == sum(n for _, n in out['senders'])
 assert out['messages'] == sum(map(sum, grid)) == sum(n for _, n in out['months'])
-json.dump(out, open('app/chav/stats.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+json.dump(out, open(f'app/{page}/stats.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print(json.dumps({k: v for k, v in out.items() if k not in ('hours', 'months', 'senders', 'topMessages')}, ensure_ascii=False, indent=1))
