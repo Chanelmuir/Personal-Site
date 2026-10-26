@@ -111,7 +111,8 @@ SKIP_MEDIA = {'2518273348677057.jpg', '704128799273984.jpg', '3275627849234908.j
 files = {f.rsplit('/', 1)[-1]: f for f in glob.glob(f'{folder}/**/*', recursive=True)}
 by_reactions = sorted(real, key=lambda m: -len(m.get('reactions', [])))
 caption = lambda m: {'name': name(m['sender_name']), 'date': m['when'].date().isoformat(), 'reactions': len(m.get('reactions', []))}
-top_messages = [caption(m) | {'text': m['content']} for m in by_reactions if m['content'] and not m.get('share')][:10]
+top_emojis = lambda m: [e for e, _ in collections.Counter(r['reaction'] for r in m.get('reactions', [])).most_common(3)]
+top_messages = [caption(m) | {'text': m['content'], 'emojis': top_emojis(m)} for m in by_reactions if m['content'] and not m.get('share')][:10]
 
 shutil.rmtree('public/chav', ignore_errors=True)
 os.makedirs('public/chav')
