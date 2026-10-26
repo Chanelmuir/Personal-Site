@@ -12,6 +12,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 from zoneinfo import ZoneInfo
 
@@ -161,6 +162,34 @@ for a, b in zip(dates, dates[1:]):
         best = run
 quiet = max(zip(real, real[1:]), key=lambda p: p[1]['timestamp_ms'] - p[0]['timestamp_ms'])
 
+# Voice note lengths: from voice-note-lengths.tsv in the export folder (file<TAB>seconds) if it's
+# there, otherwise ffprobe on the audio files the export has
+lengths = {}
+if os.path.exists(f'{folder}/voice-note-lengths.tsv'):
+    lengths = {f: float(secs) for f, secs in (line.split('\t') for line in open(f'{folder}/voice-note-lengths.tsv'))}
+voice = []
+for m in msgs:
+    for a in m.get('audio_files', []):
+        file = a['uri'].rsplit('/', 1)[-1]
+        if file not in lengths and file in files:
+            probe = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', files[file]], capture_output=True, text=True)
+            lengths[file] = float(probe.stdout or 0)
+        if lengths.get(file):
+            voice.append((name(m['sender_name']), m['when'].date().isoformat(), round(lengths[file])))
+by_person = collections.defaultdict(list)
+for who, _, secs in voice:
+    by_person[who].append(secs)
+voice_notes = voice and {
+    'count': len(voice),
+    'seconds': sum(v[2] for v in voice),
+    'maxedOut': sum(v[2] >= 299 for v in voice),  # Instagram stops recording at 5 minutes
+    'people': sorted(
+        ({'name': who, 'count': len(xs), 'seconds': sum(xs), 'longest': max(xs), 'typical': median(xs)} for who, xs in by_person.items()),
+        key=lambda p: -p['count'],
+    ),
+    'longest': [{'name': who, 'date': date, 'seconds': secs} for who, date, secs in sorted(voice, key=lambda v: -v[2])[:5]],
+}
+
 out = {
     'from': real[0]['when'].date().isoformat(),
     'to': real[-1]['when'].date().isoformat(),
@@ -192,6 +221,7 @@ out = {
     },
     'topMessages': top_messages,
     'topMedia': top_media,
+    'voiceNotes': voice_notes or None,
 }
 
 assert out['messages'] == sum(n for _, n in out['senders'])

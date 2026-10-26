@@ -2,7 +2,14 @@ import Image from 'next/image'
 import type chav from '../chav/stats.json'
 
 // Built by scripts/build-chat-stats.py, one stats.json per chat page
-export type ChatStats = typeof chav
+type VoiceNotes = {
+  count: number
+  seconds: number
+  maxedOut: number
+  people: { name: string; count: number; seconds: number; longest: number; typical: number }[]
+  longest: { name: string; date: string; seconds: number }[]
+}
+export type ChatStats = Omit<typeof chav, 'voiceNotes'> & { voiceNotes: VoiceNotes | null }
 
 type Pair = [string, number]
 
@@ -13,6 +20,8 @@ const pct = (share: number) => `${Math.round(share * 100)}%`
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const hourLabel = (h: number) => (h === 0 ? '12am' : h === 12 ? '12pm' : h < 12 ? `${h}am` : `${h - 12}pm`)
 const TOP = 15
+const duration = (secs: number) =>
+  secs < 60 ? `${secs} seconds` : secs < 3600 ? `${Math.floor(secs / 60)} min${secs % 60 ? ` ${secs % 60} s` : ''}` : `${Math.floor(secs / 3600)} hours ${Math.round((secs % 3600) / 60)} min`
 
 function Section({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
   return (
@@ -233,7 +242,7 @@ export default function ChatStatsPage({ title, stats }: { title: string; stats: 
           {(stats.fastest as Pair[]).map(([name, secs]) => (
             <li key={name} className="grid grid-cols-[7rem_1fr] gap-3 text-sm">
               <span className={name === 'Chanel' ? 'font-semibold text-accent' : 'text-text-primary'}>{name}</span>
-              <span className="tabular-nums text-text-secondary">{secs < 60 ? `${secs} seconds` : `${Math.floor(secs / 60)} min ${secs % 60} s`}</span>
+              <span className="tabular-nums text-text-secondary">{duration(secs)}</span>
             </li>
           ))}
         </ol>
@@ -253,6 +262,63 @@ export default function ChatStatsPage({ title, stats }: { title: string; stats: 
           ))}
         </dl>
       </Section>
+
+      {stats.voiceNotes && (
+        <Section title="Voice notes" note={`${duration(stats.voiceNotes.seconds)} of them altogether.`}>
+          <dl className="grid gap-6 sm:grid-cols-3">
+            {[
+              { value: fmt.format(stats.voiceNotes.count), label: 'voice notes sent' },
+              { value: duration(stats.voiceNotes.longest[0].seconds), label: `the longest, from ${stats.voiceNotes.longest[0].name} on ${longDate(stats.voiceNotes.longest[0].date)}` },
+              { value: fmt.format(stats.voiceNotes.maxedOut), label: 'ran into the 5 minute limit' },
+            ].map((s) => (
+              <div key={s.label} className="border-t-[1.5px] border-text-primary pt-3">
+                <dt className="sr-only">{s.label}</dt>
+                <dd className="text-3xl font-bold tabular-nums tracking-[-0.02em] text-text-primary [font-stretch:115%]">{s.value}</dd>
+                <dd className="mt-1 text-sm text-text-secondary">{s.label}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <h3 className="mt-10 text-sm font-semibold text-text-primary">Most voice notes</h3>
+          <div className="mt-3">
+            <Bars rows={stats.voiceNotes.people.map((p) => [p.name, p.count] as Pair)} highlight="Chanel" />
+          </div>
+
+          <div className="mt-10 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-text-secondary">
+                <tr className="border-b border-border">
+                  <th className="py-2 pr-4 font-normal">Who</th>
+                  <th className="py-2 pr-4 font-normal">Total time</th>
+                  <th className="py-2 pr-4 font-normal">Typical length</th>
+                  <th className="py-2 font-normal">Longest</th>
+                </tr>
+              </thead>
+              <tbody className="tabular-nums">
+                {stats.voiceNotes.people.map((p) => (
+                  <tr key={p.name} className="border-b border-border/60">
+                    <td className={`py-2 pr-4 ${p.name === 'Chanel' ? 'font-semibold text-accent' : 'text-text-primary'}`}>{p.name}</td>
+                    <td className="py-2 pr-4">{duration(p.seconds)}</td>
+                    <td className="py-2 pr-4">{duration(p.typical)}</td>
+                    <td className="py-2">{duration(p.longest)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="mt-10 text-sm font-semibold text-text-primary">Longest voice notes</h3>
+          <ol className="mt-3 grid gap-1.5">
+            {stats.voiceNotes.longest.map((v) => (
+              <li key={`${v.date}-${v.name}-${v.seconds}`} className="grid grid-cols-[7rem_1fr_auto] gap-3 text-sm">
+                <span className={v.name === 'Chanel' ? 'font-semibold text-accent' : 'text-text-primary'}>{v.name}</span>
+                <span className="text-text-secondary">{longDate(v.date)}</span>
+                <span className="tabular-nums text-text-secondary">{duration(v.seconds)}</span>
+              </li>
+            ))}
+          </ol>
+        </Section>
+      )}
     </div>
   )
 }
