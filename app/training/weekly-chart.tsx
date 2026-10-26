@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Week } from './stats'
 
 const fmt = new Intl.NumberFormat('en-NZ')
@@ -8,6 +8,7 @@ const shortDate = (date: string) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 
 const MIN_WEEKS = 4
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // One thin bar per week, every week since the first run. The chosen year stays full strength.
 // The strip underneath picks which weeks the chart shows.
@@ -17,9 +18,27 @@ export default function WeeklyChart({ weeks: all, year }: { weeks: Week[]; year:
   const weeks = all.slice(range[0], range[1])
   const top = Math.ceil(Math.max(...weeks.map((w) => w.km)) / 50) * 50
   const grid = Array.from({ length: top / 50 }, (_, i) => (i + 1) * 50)
-  const yearStarts = weeks.flatMap((w, i) =>
-    i > 0 && w.start.slice(0, 4) !== weeks[i - 1].start.slice(0, 4) ? [{ i, year: w.start.slice(0, 4) }] : [],
-  )
+  const axis = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(0)
+  useEffect(() => {
+    const el = axis.current
+    if (!el) return
+    const watch = new ResizeObserver(([e]) => setWidth(e.contentRect.width))
+    watch.observe(el)
+    return () => watch.disconnect()
+  }, [])
+  // Months get labels once there's room: every month, then every quarter, else years only
+  const monthPx = (width / weeks.length) * 4.35
+  const every = monthPx >= 34 ? 1 : monthPx >= 12 ? 3 : 12
+  const ticks = weeks.flatMap((w, i) => {
+    if (i === 0 || w.start.slice(0, 7) === weeks[i - 1].start.slice(0, 7)) return []
+    const m = Number(w.start.slice(5, 7)) - 1
+    if (m === 0) return [{ i, label: w.start.slice(0, 4), year: true }]
+    return m % every === 0 ? [{ i, label: MONTHS[m], year: false }] : []
+  })
+  // With no January in view, the year sits at the left edge, so drop any month it would overlap
+  const leftYear = !ticks.some((t) => t.year)
+  const shown = leftYear ? ticks.filter((t) => (t.i / weeks.length) * width > 44) : ticks
   const hovered = hover === null ? null : weeks[hover]
 
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -64,18 +83,24 @@ export default function WeeklyChart({ weeks: all, year }: { weeks: Week[]; year:
           </div>
         )}
       </div>
-      <div className="relative mt-2 h-4">
-        {yearStarts.length === 0 && (
-          <span className="absolute left-0 text-xs text-text-secondary tabular-nums">{weeks[0].start.slice(0, 4)}</span>
+      <div ref={axis} className="relative mt-2 h-4">
+        {leftYear && (
+          <span className={`absolute left-0 text-xs tabular-nums ${every < 12 ? 'text-text-primary' : 'text-text-secondary'}`}>{weeks[0].start.slice(0, 4)}</span>
         )}
-        {yearStarts.map(({ i, year: label }) => (
+        {shown.map(({ i, label, year: isYear }) => (
           <span
-            key={label}
-            className="absolute -translate-x-1/2 text-xs text-text-secondary tabular-nums"
+            key={`${i}-${label}`}
+            className={`absolute -translate-x-1/2 text-xs tabular-nums ${isYear && every < 12 ? 'text-text-primary' : 'text-text-secondary'}`}
             style={{ left: `${(i / weeks.length) * 100}%` }}
           >
-            <span className="hidden sm:inline">{label}</span>
-            <span className="sm:hidden">’{label.slice(2)}</span>
+            {isYear ? (
+              <>
+                <span className="hidden sm:inline">{label}</span>
+                <span className="sm:hidden">’{label.slice(2)}</span>
+              </>
+            ) : (
+              label
+            )}
           </span>
         ))}
       </div>
