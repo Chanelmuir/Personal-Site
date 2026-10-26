@@ -736,6 +736,93 @@
    6
   ]
  ],
+ "starters": [
+  [
+   "Tram",
+   304
+  ],
+  [
+   "Theo",
+   136
+  ],
+  [
+   "Noah",
+   113
+  ],
+  [
+   "Lahana",
+   100
+  ],
+  [
+   "Corban",
+   72
+  ],
+  [
+   "Luke",
+   67
+  ],
+  [
+   "Chanel",
+   36
+  ],
+  [
+   "Lucy",
+   35
+  ],
+  [
+   "Lucas",
+   33
+  ],
+  [
+   "Alex",
+   27
+  ]
+ ],
+ "conversations": 1141,
+ "fastest": [
+  [
+   "Tram",
+   26
+  ],
+  [
+   "Lorcan",
+   26
+  ],
+  [
+   "Josef",
+   37
+  ],
+  [
+   "Luke",
+   41
+  ],
+  [
+   "Tayne",
+   43
+  ],
+  [
+   "Caleb",
+   57
+  ],
+  [
+   "Chanel",
+   71
+  ],
+  [
+   "George",
+   71
+  ]
+ ],
+ "streak": {
+  "days": 37,
+  "from": "2025-10-25",
+  "to": "2025-11-30"
+ },
+ "quietest": {
+  "days": 12.8,
+  "from": "2024-01-15",
+  "to": "2024-01-28"
+ },
  "topMessages": [
   {
    "name": "Tayne",

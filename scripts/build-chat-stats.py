@@ -131,6 +131,29 @@ for m in by_reactions:
             img.save(f'public/chav/{file}', quality=82)
         top_media.append(caption(m) | {'src': f'/chav/{file}', 'video': file.endswith('.mp4')})
 
+# A conversation starts with the first message after 4 hours of quiet. A reply is a
+# message straight after someone else's, inside a conversation.
+QUIET = 4 * 3600 * 1000
+starters = collections.Counter()
+reply_secs = collections.defaultdict(list)
+for prev, m in zip([None] + real, real):
+    gap = m['timestamp_ms'] - prev['timestamp_ms'] if prev else QUIET
+    if gap >= QUIET:
+        starters[name(m['sender_name'])] += 1
+    elif prev['sender_name'] != m['sender_name']:
+        reply_secs[name(m['sender_name'])].append(gap / 1000)
+median = lambda xs: sorted(xs)[len(xs) // 2]
+fastest = sorted(((p, round(median(xs))) for p, xs in reply_secs.items() if len(xs) >= 50), key=lambda r: r[1])
+
+# Longest run of days in a row with at least one message, and the longest silence
+dates = sorted(datetime.date.fromisoformat(d) for d in days)
+best = run = (dates[0], dates[0])
+for a, b in zip(dates, dates[1:]):
+    run = (run[0], b) if (b - a).days == 1 else (b, b)
+    if (run[1] - run[0]) > (best[1] - best[0]):
+        best = run
+quiet = max(zip(real, real[1:]), key=lambda p: p[1]['timestamp_ms'] - p[0]['timestamp_ms'])
+
 out = {
     'from': real[0]['when'].date().isoformat(),
     'to': real[-1]['when'].date().isoformat(),
@@ -151,6 +174,15 @@ out = {
     'topEmojis': emojis.most_common(12),
     'months': [[mo, months[mo]] for mo in all_months],
     'hours': grid,
+    'starters': starters.most_common(10),
+    'conversations': sum(starters.values()),
+    'fastest': fastest[:8],
+    'streak': {'days': (best[1] - best[0]).days + 1, 'from': best[0].isoformat(), 'to': best[1].isoformat()},
+    'quietest': {
+        'days': round((quiet[1]['timestamp_ms'] - quiet[0]['timestamp_ms']) / 86_400_000, 1),
+        'from': quiet[0]['when'].date().isoformat(),
+        'to': quiet[1]['when'].date().isoformat(),
+    },
     'topMessages': top_messages,
     'topMedia': top_media,
 }

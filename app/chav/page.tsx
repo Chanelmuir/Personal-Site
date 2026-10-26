@@ -81,39 +81,6 @@ export default function ChavPage() {
         </dl>
       </header>
 
-      <Section title="Most reacted messages">
-        <ol className="grid gap-6">
-          {stats.topMessages.map((m) => (
-            <li key={`${m.date}-${m.name}`} className="grid grid-cols-[2.5rem_1fr] gap-3">
-              <span className="pt-0.5 text-right text-lg font-bold tabular-nums text-accent [font-stretch:115%]">{m.reactions}</span>
-              <div className="min-w-0">
-                <p className="text-lg leading-snug break-words text-text-primary">{m.text}</p>
-                <p className="mt-1 text-sm text-text-secondary">
-                  {m.name}, {longDate(m.date)}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </Section>
-
-      <Section title="Most reacted photos and videos">
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {stats.topMedia.map((m) => (
-            <li key={m.src}>
-              {m.video ? (
-                <video src={`${m.src}#t=0.5`} controls muted loop playsInline preload="metadata" className="aspect-[4/5] w-full rounded-[3px] bg-border object-cover" />
-              ) : (
-                <Image src={m.src} alt={`Photo from ${m.name}`} width={800} height={1000} sizes="(min-width: 640px) 240px, 50vw" className="aspect-[4/5] w-full rounded-[3px] bg-border object-cover" />
-              )}
-              <p className="mt-2 text-sm text-text-secondary">
-                <span className="font-semibold tabular-nums text-accent">{m.reactions}</span> reactions, from {m.name}, {longDate(m.date)}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
       <Section title="Who talks the most" note={`Messages sent. The other ${rest.length} people sent ${fmt.format(rest.reduce((s, [, n]) => s + n, 0))} between them.`}>
         <Bars rows={senders.slice(0, TOP)} highlight="Chanel" />
       </Section>
@@ -207,6 +174,69 @@ export default function ChavPage() {
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section title="Most reacted messages">
+        <ol className="grid gap-6">
+          {stats.topMessages.map((m) => (
+            <li key={`${m.date}-${m.name}`} className="grid grid-cols-[2.5rem_1fr] gap-3">
+              <span className="pt-0.5 text-right text-lg font-bold tabular-nums text-accent [font-stretch:115%]">{m.reactions}</span>
+              <div className="min-w-0">
+                <p className="text-lg leading-snug break-words text-text-primary">{m.text}</p>
+                <p className="mt-1 text-sm text-text-secondary">
+                  {m.name}, {longDate(m.date)}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section title="Most reacted photos and videos">
+        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {stats.topMedia.map((m) => (
+            <li key={m.src}>
+              {m.video ? (
+                <video src={`${m.src}#t=0.5`} controls muted loop playsInline preload="metadata" className="aspect-[4/5] w-full rounded-[3px] bg-border object-cover" />
+              ) : (
+                <Image src={m.src} alt={`Photo from ${m.name}`} width={800} height={1000} sizes="(min-width: 640px) 240px, 50vw" className="aspect-[4/5] w-full rounded-[3px] bg-border object-cover" />
+              )}
+              <p className="mt-2 text-sm text-text-secondary">
+                <span className="font-semibold tabular-nums text-accent">{m.reactions}</span> reactions, from {m.name}, {longDate(m.date)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section title="Who gets the chat going" note={`First message after 4 hours of quiet. ${fmt.format(stats.conversations)} conversations so far.`}>
+        <Bars rows={stats.starters as Pair[]} highlight="Chanel" />
+      </Section>
+
+      <Section title="Fastest repliers" note="Typical time to reply to someone else, among people with 50 or more replies.">
+        <ol className="grid gap-1.5">
+          {(stats.fastest as Pair[]).map(([name, secs]) => (
+            <li key={name} className="grid grid-cols-[7rem_1fr] gap-3 text-sm">
+              <span className={name === 'Chanel' ? 'font-semibold text-accent' : 'text-text-primary'}>{name}</span>
+              <span className="tabular-nums text-text-secondary">{secs < 60 ? `${secs} seconds` : `${Math.floor(secs / 60)} min ${secs % 60} s`}</span>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section title="Streaks">
+        <dl className="grid gap-6 sm:grid-cols-2">
+          {[
+            { value: `${stats.streak.days} days`, label: `in a row with at least one message, ${longDate(stats.streak.from)} to ${longDate(stats.streak.to)}` },
+            { value: `${stats.quietest.days} days`, label: `the longest the chat has gone quiet, ${longDate(stats.quietest.from)} to ${longDate(stats.quietest.to)}` },
+          ].map((s) => (
+            <div key={s.label} className="border-t-[1.5px] border-text-primary pt-3">
+              <dt className="sr-only">{s.label}</dt>
+              <dd className="text-3xl font-bold tabular-nums tracking-[-0.02em] text-text-primary [font-stretch:115%]">{s.value}</dd>
+              <dd className="mt-1 text-sm text-text-secondary">{s.label}</dd>
+            </div>
+          ))}
+        </dl>
       </Section>
     </div>
   )
