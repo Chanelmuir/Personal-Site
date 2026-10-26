@@ -636,5 +636,60 @@
   "to": "2022-02-10"
  },
  "topMessages": [],
- "topMedia": []
+ "topMedia": [],
+ "voiceNotes": {
+  "count": 1659,
+  "seconds": 49113,
+  "maxedOut": 4,
+  "people": [
+   {
+    "name": "Luke",
+    "count": 630,
+    "seconds": 22177,
+    "longest": 300,
+    "typical": 24
+   },
+   {
+    "name": "Noah",
+    "count": 537,
+    "seconds": 16687,
+    "longest": 300,
+    "typical": 20
+   },
+   {
+    "name": "Chanel",
+    "count": 492,
+    "seconds": 10249,
+    "longest": 166,
+    "typical": 14
+   }
+  ],
+  "longest": [
+   {
+    "name": "Luke",
+    "date": "2025-03-27",
+    "seconds": 300
+   },
+   {
+    "name": "Noah",
+    "date": "2025-04-05",
+    "seconds": 300
+   },
+   {
+    "name": "Noah",
+    "date": "2025-06-17",
+    "seconds": 300
+   },
+   {
+    "name": "Luke",
+    "date": "2025-08-03",
+    "seconds": 300
+   },
+   {
+    "name": "Noah",
+    "date": "2025-05-21",
+    "seconds": 297
+   }
+  ]
+ }
 }
