@@ -2,13 +2,16 @@
 
 Usage: python3 scripts/build-chat-stats.py <export folder with message_*.json>
 
-Only counts go into the output, never message text, since the chat isn't just mine.
+Mostly counts. The only message text and media kept are the 10 most reacted messages
+and 6 most reacted photos/videos (copied to public/chav).
 """
 import collections
 import datetime
 import glob
 import json
+import os
 import re
+import shutil
 import sys
 from zoneinfo import ZoneInfo
 
@@ -103,6 +106,31 @@ while f'{y}-{mo:02d}' <= last_month:
 busiest_day, busiest_count = days.most_common(1)[0]
 media = sum(len(m.get('photos', [])) + len(m.get('videos', [])) + len(m.get('audio_files', [])) for m in msgs)
 
+# Most reacted messages and media get shown in full. Skip screenshots of DMs from people outside the chat.
+SKIP_MEDIA = {'2518273348677057.jpg', '704128799273984.jpg', '3275627849234908.jpg'}
+files = {f.rsplit('/', 1)[-1]: f for f in glob.glob(f'{folder}/**/*', recursive=True)}
+by_reactions = sorted(real, key=lambda m: -len(m.get('reactions', [])))
+caption = lambda m: {'name': name(m['sender_name']), 'date': m['when'].date().isoformat(), 'reactions': len(m.get('reactions', []))}
+top_messages = [caption(m) | {'text': m['content']} for m in by_reactions if m['content'] and not m.get('share')][:10]
+
+shutil.rmtree('public/chav', ignore_errors=True)
+os.makedirs('public/chav')
+top_media = []
+for m in by_reactions:
+    for x in m.get('photos', []) + m.get('videos', []):
+        file = x['uri'].rsplit('/', 1)[-1]
+        if file in SKIP_MEDIA or file not in files or len(top_media) == 6:
+            continue
+        if file.endswith('.mp4'):
+            shutil.copy(files[file], f'public/chav/{file}')
+        else:
+            from PIL import Image
+            img = Image.open(files[file]).convert('RGB')
+            img.thumbnail((800, 800))
+            file = file.rsplit('.', 1)[0] + '.jpg'
+            img.save(f'public/chav/{file}', quality=82)
+        top_media.append(caption(m) | {'src': f'/chav/{file}', 'video': file.endswith('.mp4')})
+
 out = {
     'from': real[0]['when'].date().isoformat(),
     'to': real[-1]['when'].date().isoformat(),
@@ -123,9 +151,11 @@ out = {
     'topEmojis': emojis.most_common(12),
     'months': [[mo, months[mo]] for mo in all_months],
     'hours': grid,
+    'topMessages': top_messages,
+    'topMedia': top_media,
 }
 
 assert out['messages'] == sum(n for _, n in out['senders'])
 assert out['messages'] == sum(map(sum, grid)) == sum(n for _, n in out['months'])
 json.dump(out, open('app/chav/stats.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-print(json.dumps({k: v for k, v in out.items() if k not in ('hours', 'months', 'senders')}, ensure_ascii=False, indent=1))
+print(json.dumps({k: v for k, v in out.items() if k not in ('hours', 'months', 'senders', 'topMessages')}, ensure_ascii=False, indent=1))

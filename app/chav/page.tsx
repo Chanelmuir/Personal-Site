@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import stats from './stats.json'
 
 // Unlisted: no navbar link, not in the sitemap, and search engines are told to skip it
@@ -79,6 +80,39 @@ export default function ChavPage() {
           ))}
         </dl>
       </header>
+
+      <Section title="Most reacted messages">
+        <ol className="grid gap-6">
+          {stats.topMessages.map((m) => (
+            <li key={`${m.date}-${m.name}`} className="grid grid-cols-[2.5rem_1fr] gap-3">
+              <span className="pt-0.5 text-right text-lg font-bold tabular-nums text-accent [font-stretch:115%]">{m.reactions}</span>
+              <div className="min-w-0">
+                <p className="text-lg leading-snug break-words text-text-primary">{m.text}</p>
+                <p className="mt-1 text-sm text-text-secondary">
+                  {m.name}, {longDate(m.date)}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section title="Most reacted photos and videos">
+        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {stats.topMedia.map((m) => (
+            <li key={m.src}>
+              {m.video ? (
+                <video src={`${m.src}#t=0.5`} controls muted loop playsInline preload="metadata" className="aspect-[4/5] w-full rounded-[3px] bg-border object-cover" />
+              ) : (
+                <Image src={m.src} alt={`Photo from ${m.name}`} width={800} height={1000} sizes="(min-width: 640px) 240px, 50vw" className="aspect-[4/5] w-full rounded-[3px] bg-border object-cover" />
+              )}
+              <p className="mt-2 text-sm text-text-secondary">
+                <span className="font-semibold tabular-nums text-accent">{m.reactions}</span> reactions, from {m.name}, {longDate(m.date)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Section>
 
       <Section title="Who talks the most" note={`Messages sent. The other ${rest.length} people sent ${fmt.format(rest.reduce((s, [, n]) => s + n, 0))} between them.`}>
         <Bars rows={senders.slice(0, TOP)} highlight="Chanel" />

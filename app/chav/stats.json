@@ -735,5 +735,111 @@
    13,
    6
   ]
+ ],
+ "topMessages": [
+  {
+   "name": "Tayne",
+   "date": "2026-08-30",
+   "reactions": 21,
+   "text": "@thomasjrichards 2:28:41 PB at Sydney marathon today!!! 🕺🕺🕺🥳🥳"
+  },
+  {
+   "name": "Tram",
+   "date": "2026-07-02",
+   "reactions": 20,
+   "text": "HAPPY BDAY CHANEL"
+  },
+  {
+   "name": "Noah",
+   "date": "2026-06-23",
+   "reactions": 18,
+   "text": "Happy birthday Owen 🎂"
+  },
+  {
+   "name": "Kate",
+   "date": "2026-07-24",
+   "reactions": 18,
+   "text": "Happy birthday Lucy 🥳"
+  },
+  {
+   "name": "Lahana",
+   "date": "2025-04-12",
+   "reactions": 17,
+   "text": "4:25 for Kate at Aussie nats! Leading her heat from start to finish🤩🤩"
+  },
+  {
+   "name": "Luke",
+   "date": "2026-03-20",
+   "reactions": 17,
+   "text": "Happy Birthday Tayne 🥳🕺"
+  },
+  {
+   "name": "Lahana",
+   "date": "2026-08-06",
+   "reactions": 17,
+   "text": "HAPPY NZ BIRTHDAY @katecurrie10 🤩🎉"
+  },
+  {
+   "name": "Noah",
+   "date": "2026-02-19",
+   "reactions": 16,
+   "text": "Yayy!!! Congrats @lahana_ @tamara.reeves @tramo1234 @theowalker.04 @lucy.jurke @luke_mitchell7 @mairi_law @thomasjrichards ​for being selected to represent Canterbury at nationals next month! ⚫️🔴 🔵🟠"
+  },
+  {
+   "name": "Luke",
+   "date": "2026-04-11",
+   "reactions": 16,
+   "text": "Chav record 🥳 (Should of dipped though)"
+  },
+  {
+   "name": "Lahana",
+   "date": "2026-04-18",
+   "reactions": 16,
+   "text": "Welcome to our new members!!!! 🤩🤩"
+  }
+ ],
+ "topMedia": [
+  {
+   "name": "Lucas",
+   "date": "2026-05-22",
+   "reactions": 17,
+   "src": "/chav/1491665646024006.jpg",
+   "video": false
+  },
+  {
+   "name": "Tom",
+   "date": "2025-12-25",
+   "reactions": 14,
+   "src": "/chav/1441646330709451.mp4",
+   "video": true
+  },
+  {
+   "name": "Tom",
+   "date": "2024-10-06",
+   "reactions": 13,
+   "src": "/chav/917490140403921.jpg",
+   "video": false
+  },
+  {
+   "name": "Alex",
+   "date": "2025-10-25",
+   "reactions": 13,
+   "src": "/chav/670669762505186.jpg",
+   "video": false
+  },
+  {
+   "name": "Noah",
+   "date": "2023-08-29",
+   "reactions": 12,
+   "src": "/chav/1095679504740462.jpg",
+   "video": false
+  },
+  {
+   "name": "Tom",
+   "date": "2025-04-05",
+   "reactions": 12,
+   "src": "/chav/956404709994954.jpg",
+   "video": false
+  }
  ]
 }
