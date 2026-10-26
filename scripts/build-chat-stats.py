@@ -32,7 +32,9 @@ EMOJI = re.compile(
     '(?:‍[\U0001F000-\U0001FAFF☀-➿♀♂][️\U0001F3FB-\U0001F3FF]*)*)'
 )
 # Treat ❤ and ❤️ (and other emoji with or without the variation selector) as one
-norm = lambda e: e.replace('️', '')
+def norm(e):
+    e = e.replace('\uFE0F', '')
+    return '❤\uFE0F' if e == '❤' else e  # bare ❤ shows black on some phones
 
 folder = sys.argv[1]
 msgs = []
