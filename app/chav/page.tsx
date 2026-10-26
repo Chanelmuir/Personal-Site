@@ -177,18 +177,32 @@ export default function ChavPage() {
       </Section>
 
       <Section title="Most reacted messages">
-        <ol className="grid gap-6">
-          {stats.topMessages.map((m) => (
-            <li key={`${m.date}-${m.name}`} className="grid grid-cols-[2.5rem_1fr] gap-3">
-              <span className="pt-0.5 text-right text-lg font-bold tabular-nums text-accent [font-stretch:115%]">{m.reactions}</span>
-              <div className="min-w-0">
-                <p className="text-lg leading-snug break-words text-text-primary">{m.text}</p>
-                <p className="mt-1 text-sm text-text-secondary">
+        <ol className="grid max-w-xl gap-7">
+          {stats.topMessages.map((m) => {
+            const mine = m.name === 'Chanel'
+            return (
+              <li key={`${m.date}-${m.name}`} className={`flex flex-col ${mine ? 'items-end' : 'items-start'}`}>
+                <span className="mb-1 px-3 text-xs text-text-secondary">
                   {m.name}, {longDate(m.date)}
-                </p>
-              </div>
-            </li>
-          ))}
+                </span>
+                <div className="relative max-w-[85%]">
+                  <p
+                    className={`rounded-[20px] px-4 py-2.5 leading-snug break-words ${
+                      mine ? 'bg-accent text-white' : 'bg-surface text-text-primary ring-1 ring-border'
+                    }`}
+                  >
+                    {m.text.split(/(@[\w.]+)/).map((part, i) => (i % 2 ? <strong key={i} className="font-semibold">{part}</strong> : part))}
+                  </p>
+                  <span
+                    className={`absolute -bottom-3.5 ${mine ? 'right-3' : 'left-3'} flex items-center gap-0.5 rounded-full bg-surface px-1.5 py-0.5 text-xs shadow-[0_0_0_2px_var(--color-background)] ring-1 ring-border`}
+                  >
+                    {m.emojis.join('')}
+                    <span className="ml-0.5 tabular-nums text-text-secondary">{m.reactions}</span>
+                  </span>
+                </div>
+              </li>
+            )
+          })}
         </ol>
       </Section>
 
