@@ -113,15 +113,13 @@ media = sum(len(m.get('photos', [])) + len(m.get('videos', [])) + len(m.get('aud
 
 # Most reacted messages and media get shown in full. Skip screenshots of DMs from people outside the chat.
 SKIP_MEDIA = {'2518273348677057.jpg', '704128799273984.jpg', '3275627849234908.jpg'}
-# Messages about someone's health stay out too (by timestamp_ms)
-SKIP_MESSAGES = {1721336426091, 1739233730770, 1739908440074, 1750204997459}
 files = {f.rsplit('/', 1)[-1]: f for f in glob.glob(f'{folder}/**/*', recursive=True)}
 by_reactions = sorted(real, key=lambda m: -len(m.get('reactions', [])))
 # In a small chat nearly every message tops out at the same few reactions, so a ranking means nothing
 ranked = by_reactions if len(by_reactions[0].get('reactions', [])) >= 5 else []
 caption = lambda m: {'name': name(m['sender_name']), 'date': m['when'].date().isoformat(), 'reactions': len(m.get('reactions', []))}
 top_emojis = lambda m: [e for e, _ in collections.Counter(r['reaction'] for r in m.get('reactions', [])).most_common(3)]
-top_messages = [caption(m) | {'text': m['content'], 'emojis': top_emojis(m)} for m in ranked if m['content'] and not m.get('share') and m['timestamp_ms'] not in SKIP_MESSAGES][:10]
+top_messages = [caption(m) | {'text': m['content'], 'emojis': top_emojis(m)} for m in ranked if m['content'] and not m.get('share')][:10]
 
 shutil.rmtree(f'public/{page}', ignore_errors=True)
 os.makedirs(f'public/{page}')
