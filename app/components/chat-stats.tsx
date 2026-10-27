@@ -53,7 +53,7 @@ function Bars({ rows, highlight }: { rows: Pair[]; highlight?: string }) {
   )
 }
 
-// Shared by the unlisted group chat pages (/chav, /updates)
+// Shared by the unlisted group chat pages (/chav, /updates, /melvin-gordon)
 export default function ChatStatsPage({ title, stats }: { title: string; stats: ChatStats }) {
   const senders = stats.senders as Pair[]
   const rest = senders.slice(TOP)
