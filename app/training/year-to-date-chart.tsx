@@ -33,14 +33,15 @@ function longestBreak(km: number[]) {
 }
 
 // Each year's running total, day by day, so the current year can be lined up against the rest.
-// Years can be picked to stand out, a drag across the chart zooms in, and two picked years show
+// Years can be picked to stand out, dragging a box on the chart zooms into it, and two picked years show
 // the gap between them.
 export default function YearToDateChart({ years, selected }: { years: YearToDate[]; selected: number | null }) {
   const current = years[years.length - 1].year
   const [picked, setPicked] = useState<number[]>([])
   const [hover, setHover] = useState<number | null>(null)
   const [zoom, setZoom] = useState<[number, number]>([0, 365])
-  const [drag, setDrag] = useState<[number, number] | null>(null)
+  const [kmZoom, setKmZoom] = useState<[number, number] | null>(null)
+  const [drag, setDrag] = useState<{ day: number; km: number }[] | null>(null)
   const [d0, d1] = zoom
   const span = d1 - d0
 
@@ -56,10 +57,14 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
   const inView = years.filter((y) => y.km.length > d0)
   const low = Math.min(...inView.map((y) => at(y, d0)))
   const high = Math.max(...inView.map((y) => at(y, d1 - 1)))
-  const step = STEPS.find((s) => (high - low) / s <= 6) ?? 2000
-  const bottom = Math.floor(low / step) * step
-  const top = Math.max(bottom + step, Math.ceil(high / step) * step)
-  const grid = Array.from({ length: (top - bottom) / step + 1 }, (_, i) => bottom + i * step).filter((km) => km > bottom || bottom > 0)
+  const [from, to] = kmZoom ?? [low, high]
+  const step = STEPS.find((s) => (to - from) / s <= 6) ?? 2000
+  // A box zoom keeps exactly the km range drawn; otherwise round out to the grid
+  const bottom = kmZoom ? from : Math.floor(from / step) * step
+  const top = kmZoom ? to : Math.max(bottom + step, Math.ceil(to / step) * step)
+  const grid = Array.from({ length: Math.floor(top / step) - Math.ceil(bottom / step) + 1 }, (_, i) => (Math.ceil(bottom / step) + i) * step).filter(
+    (km) => km > bottom || bottom > 0,
+  )
   const yOf = (km: number) => 100 - ((km - bottom) / (top - bottom)) * 100
   const xOf = (day: number) => ((day - d0) / span) * 100
   const points = (y: YearToDate, from = d0, to = d1) =>
@@ -75,7 +80,8 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
       return { year: y.year, km: at(y, day), x: xOf(day + 1), y: yOf(at(y, day)) }
     })
     .sort((a, b) => a.y - b.y)
-  const atRight = ends.filter((e) => e.x > 90)
+  const visibleEnds = ends.filter((e) => e.y >= 0 && e.y <= 100)
+  const atRight = visibleEnds.filter((e) => e.x > 90)
   for (let i = 1; i < atRight.length; i++) {
     if (atRight[i].y - atRight[i - 1].y < LABEL_GAP) atRight[i].y = atRight[i - 1].y + LABEL_GAP
   }
@@ -97,24 +103,32 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
     return { a, b, widest, area, ahead: a.km[widest] >= b.km[widest] ? a : b, km: Math.abs(a.km[widest] - b.km[widest]) }
   })()
 
-  const dayAt = (e: React.PointerEvent<HTMLDivElement>) => {
+  const pointAt = (e: React.PointerEvent<HTMLDivElement>) => {
     const box = e.currentTarget.getBoundingClientRect()
-    return Math.max(d0, Math.min(d1 - 1, Math.round(d0 + ((e.clientX - box.left) / box.width) * span)))
+    const fy = Math.max(0, Math.min(1, (e.clientY - box.top) / box.height))
+    return {
+      day: Math.max(d0, Math.min(d1 - 1, Math.round(d0 + ((e.clientX - box.left) / box.width) * span))),
+      km: top - fy * (top - bottom),
+    }
   }
   const onDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
-    setDrag([dayAt(e), dayAt(e)])
+    setDrag([pointAt(e), pointAt(e)])
   }
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const day = dayAt(e)
-    setHover(day)
-    if (drag) setDrag([drag[0], day])
+    const p = pointAt(e)
+    setHover(p.day)
+    if (drag) setDrag([drag[0], p])
   }
   const onUp = () => {
     if (drag) {
-      const [a, b] = [Math.min(...drag), Math.max(...drag) + 1]
-      if (b - a >= MIN_ZOOM) {
-        setZoom([a, b])
+      const [a, b] = drag
+      const days: [number, number] = [Math.min(a.day, b.day), Math.max(a.day, b.day) + 1]
+      const kms: [number, number] = [Math.min(a.km, b.km), Math.max(a.km, b.km)]
+      if (days[1] - days[0] >= MIN_ZOOM) {
+        setZoom(days)
+        // A flat swipe zooms the dates only and lets the km axis fit itself
+        setKmZoom(kms[1] - kms[0] > (top - bottom) * 0.05 ? kms : null)
         setHover(null)
       }
     }
@@ -150,17 +164,20 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
             </button>
           )
         })}
-        {span < 365 && (
+        {(span < 365 || kmZoom) && (
           <button
             type="button"
-            onClick={() => setZoom([0, 365])}
+            onClick={() => {
+              setZoom([0, 365])
+              setKmZoom(null)
+            }}
             className="ml-auto border border-text-primary px-2.5 py-1 text-sm text-text-primary hover:bg-text-primary hover:text-background"
           >
             Show the whole year
           </button>
         )}
       </div>
-      <p className="mt-2 text-xs text-text-secondary">Pick years to compare. Drag across the chart to zoom in.</p>
+      <p className="mt-2 text-xs text-text-secondary">Pick years to compare. Drag a box on the chart to zoom in.</p>
 
       <div className="relative mt-6 pr-24 pl-14">
         <div
@@ -215,8 +232,8 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
               className="pointer-events-none absolute border-l border-dashed border-text-primary"
               style={{
                 left: `${xOf(gap.widest)}%`,
-                top: `${yOf(Math.max(gap.a.km[gap.widest], gap.b.km[gap.widest]))}%`,
-                bottom: `${100 - yOf(Math.min(gap.a.km[gap.widest], gap.b.km[gap.widest]))}%`,
+                top: `${Math.max(0, yOf(Math.max(gap.a.km[gap.widest], gap.b.km[gap.widest])))}%`,
+                bottom: `${Math.max(0, 100 - yOf(Math.min(gap.a.km[gap.widest], gap.b.km[gap.widest])))}%`,
               }}
             >
               <span
@@ -228,7 +245,7 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
               </span>
             </div>
           )}
-          {ends.map((e) => (
+          {visibleEnds.map((e) => (
             <button
               key={e.year}
               type="button"
@@ -241,10 +258,15 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
               {e.year} <span className="hidden sm:inline">{fmt.format(Math.round(e.km))}</span>
             </button>
           ))}
-          {drag && drag[0] !== drag[1] && (
+          {drag && drag[0].day !== drag[1].day && (
             <div
-              className="pointer-events-none absolute inset-y-0 bg-accent/10"
-              style={{ left: `${xOf(Math.min(...drag))}%`, width: `${(Math.abs(drag[1] - drag[0]) / span) * 100}%` }}
+              className="pointer-events-none absolute border border-accent bg-accent/10"
+              style={{
+                left: `${xOf(Math.min(drag[0].day, drag[1].day))}%`,
+                width: `${(Math.abs(drag[1].day - drag[0].day) / span) * 100}%`,
+                top: `${yOf(Math.max(drag[0].km, drag[1].km))}%`,
+                bottom: `${100 - yOf(Math.min(drag[0].km, drag[1].km))}%`,
+              }}
             />
           )}
           {hover !== null && !drag && (
