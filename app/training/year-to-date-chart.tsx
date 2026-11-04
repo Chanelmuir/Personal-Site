@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { YearToDate } from './stats'
 
 const fmt = new Intl.NumberFormat('en-NZ')
@@ -10,7 +10,10 @@ const LABEL_GAP = 6 // % of the chart height between end labels
 const STEPS = [10, 20, 25, 50, 100, 200, 250, 500, 1000]
 // The latest year is always blue; other picked years take the next colour along
 const COLOURS = ['#d9632a', '#2b8a57', '#a8357a', '#17232b', '#8a6d1c', '#0f8a99']
-const MIN_ZOOM = 7
+const MIN_DAYS = 7
+const MIN_KM = 20
+
+type View = { x: [number, number]; km: [number, number] }
 
 const dayLabel = (day: number) => {
   const m = MONTH_START.findLastIndex((s) => s <= day)
@@ -33,17 +36,24 @@ function longestBreak(km: number[]) {
 }
 
 // Each year's running total, day by day, so the current year can be lined up against the rest.
-// Years can be picked to stand out, dragging a box on the chart zooms into it, and two picked years show
-// the gap between them.
+// Years can be picked to stand out, ctrl + scroll zooms around the cursor (drag to pan once zoomed),
+// and two picked years show the gap between them.
 export default function YearToDateChart({ years, selected }: { years: YearToDate[]; selected: number | null }) {
   const current = years[years.length - 1].year
   const [picked, setPicked] = useState<number[]>([])
   const [hover, setHover] = useState<number | null>(null)
-  const [zoom, setZoom] = useState<[number, number]>([0, 365])
-  const [kmZoom, setKmZoom] = useState<[number, number] | null>(null)
-  const [drag, setDrag] = useState<{ day: number; km: number }[] | null>(null)
-  const [d0, d1] = zoom
+  const [view, setView] = useState<View | null>(null)
+  const [pan, setPan] = useState<{ x: number; y: number; view: View } | null>(null)
+  const chart = useRef<HTMLDivElement>(null)
+
+  const fullHigh = Math.max(...years.map((y) => y.km[y.km.length - 1]))
+  const fullStep = STEPS.find((s) => fullHigh / s <= 6) ?? 2000
+  const fullTop = Math.ceil(fullHigh / fullStep) * fullStep
+  const [d0, d1] = view?.x ?? [0, 365]
+  const [bottom, top] = view?.km ?? [0, fullTop]
   const span = d1 - d0
+  const i0 = Math.floor(d0)
+  const i1 = Math.ceil(d1)
 
   const shown = [current, ...picked, ...(selected !== null && !picked.includes(selected) && selected !== current ? [selected] : [])]
   const colour = (year: number) =>
@@ -52,22 +62,15 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
   const toggle = (year: number) =>
     year !== current && setPicked((p) => (p.includes(year) ? p.filter((y) => y !== year) : [...p, year]))
 
-  // Scale the km axis to whatever is in view
   const at = (y: YearToDate, day: number) => y.km[Math.min(day, y.km.length - 1)]
-  const inView = years.filter((y) => y.km.length > d0)
-  const low = Math.min(...inView.map((y) => at(y, d0)))
-  const high = Math.max(...inView.map((y) => at(y, d1 - 1)))
-  const [from, to] = kmZoom ?? [low, high]
-  const step = STEPS.find((s) => (to - from) / s <= 6) ?? 2000
-  // A box zoom keeps exactly the km range drawn; otherwise round out to the grid
-  const bottom = kmZoom ? from : Math.floor(from / step) * step
-  const top = kmZoom ? to : Math.max(bottom + step, Math.ceil(to / step) * step)
+  const inView = years.filter((y) => y.km.length > i0)
+  const step = STEPS.find((s) => (top - bottom) / s <= 6) ?? 2000
   const grid = Array.from({ length: Math.floor(top / step) - Math.ceil(bottom / step) + 1 }, (_, i) => (Math.ceil(bottom / step) + i) * step).filter(
     (km) => km > bottom || bottom > 0,
   )
   const yOf = (km: number) => 100 - ((km - bottom) / (top - bottom)) * 100
   const xOf = (day: number) => ((day - d0) / span) * 100
-  const points = (y: YearToDate, from = d0, to = d1) =>
+  const points = (y: YearToDate, from = i0, to = i1) =>
     y.km
       .slice(from, Math.min(to + 1, y.km.length))
       .map((km, i) => `${from + i - d0},${yOf(km)}`)
@@ -76,8 +79,8 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
   // End labels, nudged apart so close finishes don't overlap
   const ends = inView
     .map((y) => {
-      const day = Math.min(y.km.length, d1) - 1
-      return { year: y.year, km: at(y, day), x: xOf(day + 1), y: yOf(at(y, day)) }
+      const day = Math.min(y.km.length, i1) - 1
+      return { year: y.year, km: at(y, day), x: Math.min(100, xOf(day + 1)), y: yOf(at(y, day)) }
     })
     .sort((a, b) => a.y - b.y)
   const visibleEnds = ends.filter((e) => e.y >= 0 && e.y <= 100)
@@ -91,48 +94,70 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
   const gap = pair && (() => {
     const [a, b] = pair
     const last = Math.min(a.km.length, b.km.length)
-    let widest = d0
-    for (let day = d0; day < Math.min(d1, last); day++) {
+    let widest = i0
+    for (let day = i0; day < Math.min(i1, last); day++) {
       if (Math.abs(a.km[day] - b.km[day]) > Math.abs(a.km[widest] - b.km[widest])) widest = day
     }
-    const to = Math.min(d1, last - 1)
-    const area = `${points(a, d0, to)} ${b.km
-      .slice(d0, to + 1)
+    const to = Math.min(i1, last - 1)
+    const area = `${points(a, i0, to)} ${b.km
+      .slice(i0, to + 1)
       .map((km, i) => `${to - i - d0},${yOf(b.km[to - i])}`)
       .join(' ')}`
     return { a, b, widest, area, ahead: a.km[widest] >= b.km[widest] ? a : b, km: Math.abs(a.km[widest] - b.km[widest]) }
   })()
 
-  const pointAt = (e: React.PointerEvent<HTMLDivElement>) => {
-    const box = e.currentTarget.getBoundingClientRect()
-    const fy = Math.max(0, Math.min(1, (e.clientY - box.top) / box.height))
-    return {
-      day: Math.max(d0, Math.min(d1 - 1, Math.round(d0 + ((e.clientX - box.left) / box.width) * span))),
-      km: top - fy * (top - bottom),
+  // Keeps a view inside the year and the km range; zoomed all the way out is no zoom at all
+  const fit = (x: [number, number], km: [number, number]): View | null => {
+    const w = Math.min(365, Math.max(MIN_DAYS, x[1] - x[0]))
+    const h = Math.min(fullTop, Math.max(MIN_KM, km[1] - km[0]))
+    if (w >= 365 && h >= fullTop) return null
+    const x0 = Math.max(0, Math.min(365 - w, x[0]))
+    const k0 = Math.max(0, Math.min(fullTop - h, km[0]))
+    return { x: [x0, x0 + w], km: [k0, k0 + h] }
+  }
+
+  // Ctrl (or ⌘) + scroll, and trackpad pinch, zoom around the cursor. React's wheel handler is passive, so
+  // this one is added by hand to be allowed to stop the page zooming.
+  useEffect(() => {
+    const el = chart.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return
+      e.preventDefault()
+      const box = el.getBoundingClientRect()
+      const fx = (e.clientX - box.left) / box.width
+      const fy = (e.clientY - box.top) / box.height
+      const f = Math.exp(Math.max(-0.4, Math.min(0.4, e.deltaY * 0.004)))
+      setView((v) => {
+        const [x0, x1] = v?.x ?? [0, 365]
+        const [k0, k1] = v?.km ?? [0, fullTop]
+        const cx = x0 + fx * (x1 - x0)
+        const ck = k1 - fy * (k1 - k0)
+        const w = (x1 - x0) * f
+        const h = (k1 - k0) * f
+        return fit([cx - fx * w, cx - fx * w + w], [ck - (1 - fy) * h, ck - (1 - fy) * h + h])
+      })
+      setHover(null)
     }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  })
+
+  const dayAt = (e: React.PointerEvent<HTMLDivElement>) => {
+    const box = e.currentTarget.getBoundingClientRect()
+    return Math.max(i0, Math.min(Math.min(i1, 365) - 1, Math.round(d0 + ((e.clientX - box.left) / box.width) * span)))
   }
   const onDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!view) return
     e.currentTarget.setPointerCapture(e.pointerId)
-    setDrag([pointAt(e), pointAt(e)])
+    setPan({ x: e.clientX, y: e.clientY, view })
   }
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const p = pointAt(e)
-    setHover(p.day)
-    if (drag) setDrag([drag[0], p])
-  }
-  const onUp = () => {
-    if (drag) {
-      const [a, b] = drag
-      const days: [number, number] = [Math.min(a.day, b.day), Math.max(a.day, b.day) + 1]
-      const kms: [number, number] = [Math.min(a.km, b.km), Math.max(a.km, b.km)]
-      if (days[1] - days[0] >= MIN_ZOOM) {
-        setZoom(days)
-        // A flat swipe zooms the dates only and lets the km axis fit itself
-        setKmZoom(kms[1] - kms[0] > (top - bottom) * 0.05 ? kms : null)
-        setHover(null)
-      }
-    }
-    setDrag(null)
+    if (!pan) return setHover(dayAt(e))
+    const box = e.currentTarget.getBoundingClientRect()
+    const dx = ((e.clientX - pan.x) / box.width) * (pan.view.x[1] - pan.view.x[0])
+    const dk = ((e.clientY - pan.y) / box.height) * (pan.view.km[1] - pan.view.km[0])
+    setView(fit([pan.view.x[0] - dx, pan.view.x[1] - dx], [pan.view.km[0] + dk, pan.view.km[1] + dk]))
   }
 
   const rows =
@@ -164,28 +189,26 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
             </button>
           )
         })}
-        {(span < 365 || kmZoom) && (
+        {view && (
           <button
             type="button"
-            onClick={() => {
-              setZoom([0, 365])
-              setKmZoom(null)
-            }}
+            onClick={() => setView(null)}
             className="ml-auto border border-text-primary px-2.5 py-1 text-sm text-text-primary hover:bg-text-primary hover:text-background"
           >
             Show the whole year
           </button>
         )}
       </div>
-      <p className="mt-2 text-xs text-text-secondary">Pick years to compare. Drag a box on the chart to zoom in.</p>
+      <p className="mt-2 text-xs text-text-secondary">Pick years to compare. Hold Ctrl (⌘ on a Mac) and scroll over the chart to zoom, then drag to move around.</p>
 
       <div className="relative mt-6 pr-24 pl-14">
         <div
-          className="relative h-72 cursor-crosshair touch-pan-y select-none"
+          ref={chart}
+          className={`relative h-72 select-none ${view ? (pan ? 'cursor-grabbing' : 'cursor-grab') : ''} ${view ? 'touch-none' : 'touch-pan-y'}`}
           onPointerDown={onDown}
           onPointerMove={onMove}
-          onPointerUp={onUp}
-          onPointerLeave={() => !drag && setHover(null)}
+          onPointerUp={() => setPan(null)}
+          onPointerLeave={() => !pan && setHover(null)}
         >
           {grid.map((km) => (
             <div key={km} className="absolute inset-x-0 border-t border-border" style={{ top: `${yOf(km)}%` }}>
@@ -258,18 +281,7 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
               {e.year} <span className="hidden sm:inline">{fmt.format(Math.round(e.km))}</span>
             </button>
           ))}
-          {drag && drag[0].day !== drag[1].day && (
-            <div
-              className="pointer-events-none absolute border border-accent bg-accent/10"
-              style={{
-                left: `${xOf(Math.min(drag[0].day, drag[1].day))}%`,
-                width: `${(Math.abs(drag[1].day - drag[0].day) / span) * 100}%`,
-                top: `${yOf(Math.max(drag[0].km, drag[1].km))}%`,
-                bottom: `${100 - yOf(Math.min(drag[0].km, drag[1].km))}%`,
-              }}
-            />
-          )}
-          {hover !== null && !drag && (
+          {hover !== null && !pan && (
             <>
               <div className="pointer-events-none absolute inset-y-0 border-l border-text-primary/40" style={{ left: `${xOf(hover)}%` }} />
               <div
@@ -309,7 +321,7 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
                   </span>
                 ) : null,
               )
-            : [d0, Math.round((d0 + d1) / 2), d1 - 1].map((day, i) => (
+            : [Math.ceil(d0), Math.round((d0 + d1) / 2), Math.floor(d1) - 1].map((day, i) => (
                 <span
                   key={day}
                   className={`absolute text-xs whitespace-nowrap text-text-secondary ${i === 1 ? '-translate-x-1/2' : i === 2 ? '-translate-x-full' : ''}`}
