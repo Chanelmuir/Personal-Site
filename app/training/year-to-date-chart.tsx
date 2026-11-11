@@ -55,7 +55,7 @@ export default function YearToDateChart({ years, selected }: { years: YearToDate
   const i0 = Math.floor(d0)
   const i1 = Math.ceil(d1)
 
-  const shown = [current, ...picked, ...(selected !== null && !picked.includes(selected) && selected !== current ? [selected] : [])]
+  const shown = [current, ...picked, ...(selected !== null && !picked.includes(selected) && selected !== current && years.some((y) => y.year === selected) ? [selected] : [])]
   const colour = (year: number) =>
     year === current ? 'var(--color-accent)' : year === selected && !picked.includes(year) ? 'var(--color-text-primary)' : COLOURS[picked.indexOf(year) % COLOURS.length]
   const isShown = (year: number) => shown.includes(year)
