@@ -8,6 +8,7 @@ const shortDate = (date: string) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 
 const MIN_WEEKS = 4
+const AVG_WEEKS = 8
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // One thin bar per week, every week since the first run. The chosen year stays full strength.
@@ -16,7 +17,13 @@ export default function WeeklyChart({ weeks: all, year }: { weeks: Week[]; year:
   const [hover, setHover] = useState<number | null>(null)
   const [range, setRange] = useState<[number, number]>([0, all.length])
   const weeks = all.slice(range[0], range[1])
-  const top = Math.ceil(Math.max(...weeks.map((w) => w.km)) / 50) * 50
+  // Rolling 8-week average, worked out over every week so the first weeks in view still use the weeks before them
+  const avgAll = all.map((_, i) =>
+    i < AVG_WEEKS - 1 ? null : all.slice(i - AVG_WEEKS + 1, i + 1).reduce((t, w) => t + w.km, 0) / AVG_WEEKS,
+  )
+  const avg = avgAll.slice(range[0], range[1])
+  const top = Math.ceil(Math.max(...weeks.map((w) => w.km), ...avg.map((a) => a ?? 0)) / 50) * 50
+  const avgLine = avg.flatMap((a, i) => (a === null ? [] : [`${i + 0.5},${100 - (a / top) * 100}`])).join(' ')
   const grid = Array.from({ length: top / 50 }, (_, i) => (i + 1) * 50)
   const axis = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
@@ -49,6 +56,10 @@ export default function WeeklyChart({ weeks: all, year }: { weeks: Week[]; year:
 
   return (
     <div className="relative mt-8 pl-12">
+      <p className="mb-3 flex items-center justify-end gap-2 text-xs text-text-secondary">
+        <span className="inline-block h-0.5 w-5 bg-text-primary" aria-hidden="true" />
+        8-week average
+      </p>
       <div className="relative h-52" onPointerMove={onMove} onPointerLeave={() => setHover(null)}>
         {grid.map((km) => (
           <div key={km} className="absolute inset-x-0 border-t border-border" style={{ bottom: `${(km / top) * 100}%` }}>
@@ -69,6 +80,7 @@ export default function WeeklyChart({ weeks: all, year }: { weeks: Week[]; year:
               />
             )
           })}
+          <polyline points={avgLine} fill="none" vectorEffect="non-scaling-stroke" strokeWidth={1.5} strokeLinejoin="round" className="stroke-text-primary" />
         </svg>
         <div className="absolute inset-x-0 bottom-0 border-t border-text-primary" />
         {hovered && hover !== null && (
@@ -80,6 +92,9 @@ export default function WeeklyChart({ weeks: all, year }: { weeks: Week[]; year:
             <span className="block text-text-secondary tabular-nums">
               Week of {shortDate(hovered.start)}, {hovered.runs} {hovered.runs === 1 ? 'run' : 'runs'}
             </span>
+            {avg[hover] !== null && (
+              <span className="block text-text-secondary tabular-nums">8-week average {fmt.format(Math.round(avg[hover]! * 10) / 10)} km</span>
+            )}
           </div>
         )}
       </div>
