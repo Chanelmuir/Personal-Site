@@ -102,8 +102,11 @@ strava_starts = sorted(a['start'] for a in activities)
 cutoff = strava_starts[-1]
 
 
+strava = list(activities)  # only Strava rows, so back-to-back COROS runs don't match each other
+
+
 def strava_match(start):
-    return next((a for a in activities if abs(a['start'] - start) <= MATCH_WINDOW_S), None)
+    return next((a for a in strava if abs(a['start'] - start) <= MATCH_WINDOW_S), None)
 
 
 # COROS fills in routes Strava's export lacks, and adds anything Strava never got
